@@ -1,5 +1,5 @@
-import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Graphics;
 
 public class Particle implements Drawable {
     private Util.Point position;
@@ -7,7 +7,7 @@ public class Particle implements Drawable {
 
     public Particle(Util.Point p) {
         position = p;
-        lifespan = 255.0f;
+        lifespan = Constants.particleLifespan;
     }
 
     public boolean isDead() {
