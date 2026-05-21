@@ -6,10 +6,16 @@ public class Polygon implements Drawable {
     double radius;
     Util.Point position;
 
+    /**
+     * Polygon that is defined in meters
+     * @param sides
+     * @param radius in meters
+     * @param position in meters
+     */
     public Polygon(int sides, double radius, Util.Point position) {
         this.sides = sides;
-        this.radius = radius;
-        this.position = position;
+        this.radius = radius * Constants.pixelsPerMeter;
+        this.position = position.toPixels();
     }
 
     public void setPosition(Util.Point p) {

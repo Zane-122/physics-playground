@@ -10,7 +10,7 @@ public class PhysicsObject implements Drawable {
 
     public PhysicsObject(Drawable d, Util.Point p, double m) {
         visual = d;
-        position = p;
+        position = p.toPixels();
         velocityX = 0;
         velocityY = 0;
         mass = m;

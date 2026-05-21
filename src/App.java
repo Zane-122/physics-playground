@@ -5,7 +5,7 @@ public class App {
 
         Window myWindow = new Window(400, 300, "Physics Playground", drawingPanel);
 
-        PhysicsObject obj = new PhysicsObject(new Polygon(4, 50, new Util.Point(100, 100)), new Util.Point(100, 100), 1);
+        PhysicsObject obj = new PhysicsObject(new Polygon(4, 50, new Util.Point(3, 3)), new Util.Point(3, 3), 1);
         drawingPanel.addObject(obj);
         myWindow.display();
 
