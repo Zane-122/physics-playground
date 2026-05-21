@@ -5,7 +5,15 @@ public class App {
 
         Window myWindow = new Window(400, 300, "Physics Playground", drawingPanel);
 
-        drawingPanel.addObject(new Polygon(6, 100, new Util.Point(100, 100)));
+        PhysicsObject obj = new PhysicsObject(new Polygon(4, 50, new Util.Point(100, 100)), new Util.Point(100, 100), 1);
+        drawingPanel.addObject(obj);
         myWindow.display();
+
+        while (true) {
+            obj.update();
+            drawingPanel.repaint();
+            
+            Thread.sleep(16);
+        }
     }
 }

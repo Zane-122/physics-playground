@@ -12,6 +12,10 @@ public class Polygon implements Drawable {
         this.position = position;
     }
 
+    public void setPosition(Util.Point p) {
+        position = p;
+    }
+
     @Override
     public void draw(Graphics g) {
 
@@ -27,5 +31,9 @@ public class Polygon implements Drawable {
         }
 
         g.drawPolygon(xPoints, yPoints, sides);
+    }
+
+    public Util.Point getPosition() {
+        return position;
     }
 }
