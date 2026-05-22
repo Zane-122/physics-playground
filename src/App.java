@@ -13,7 +13,7 @@ public class App {
         drawingPanel.addObject(obj);
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticle();  // spawn one particle per frame
+            ps.spawnParticles(5);  // spawn one particle per frame
             ps.update();
             obj.update();
             drawingPanel.repaint();
