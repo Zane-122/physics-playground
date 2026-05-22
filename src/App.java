@@ -16,6 +16,7 @@ public class App {
             ps.addParticle();  // spawn one particle per frame
             ps.update();
             obj.update();
+            
             drawingPanel.repaint();
         });
 
