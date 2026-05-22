@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 
 public class PhysicsObject implements Drawable {
@@ -96,6 +97,7 @@ public class PhysicsObject implements Drawable {
 
     @Override
     public final void draw(Graphics g) {
+        g.setColor(Color.RED);
         visual.draw(g);
     }
 
