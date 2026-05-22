@@ -72,7 +72,7 @@ public class PhysicsObject implements Drawable {
         mass = m;
     }
 
-    public void update() {
+    public void update(Simulation sim) {
         velocityX += 0;
         velocityY += Constants.gravityStep;
 

@@ -24,17 +24,17 @@ public class ParticleSystem {
         double vy = Math.sin(angle) * velocity;
         PolygonHitbox hitbox = (PolygonHitbox) new Polygon(5, 8, spawnpoint);
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
-        po.update();
+
         particles.add(po);
         panel.addObject(po);
     }
 
-    public void update() {  
+    public void update(Simulation sim) {  
         for (int i = particles.size() - 1; i >= 0; i--) {
             PhysicsObject p = particles.get(i);
             Particle visual = (Particle) p.getVisual();
 
-            p.update();
+            p.update(sim);
             visual.fade();
 
             if (visual.isDead()) {

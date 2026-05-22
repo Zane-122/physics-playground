@@ -7,8 +7,9 @@ public class DrawingPanel extends JPanel {
     private ArrayList<Drawable> drawables = new ArrayList<>();
     private Util.Point mousePosition = null;
     private boolean mouseHeld = false;
+    private Simulation sim;
 
-    public DrawingPanel() {
+    public DrawingPanel(Simulation sim) {
         MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -31,6 +32,8 @@ public class DrawingPanel extends JPanel {
 
         addMouseListener(ma);
         addMouseMotionListener(ma);
+
+         this.sim = sim;
     }
 
 
@@ -56,6 +59,10 @@ public class DrawingPanel extends JPanel {
 
         for (Drawable d : drawables) {
             d.draw(g);
+        }
+
+        for (PhysicsObject o : sim.getObjects()) {
+            o.draw(g);
         }
     }
 }
