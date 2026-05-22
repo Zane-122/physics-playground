@@ -34,6 +34,7 @@ public class PhysicsObject implements Drawable {
      */
     public PhysicsObject(Drawable visual, PolygonHitbox hitbox, Util.Point p, double m, double initialVelocityX, double initialVelocityY) {
         this.visual = visual;
+        this.hitbox = hitbox;
         position = p;
         velocityX = initialVelocityX;
         velocityY = initialVelocityY;
@@ -48,7 +49,7 @@ public class PhysicsObject implements Drawable {
      */
     public PhysicsObject(Polygon polygon, Util.Point p, double m) {
         this.visual = polygon;
-        this.hitbox = (PolygonHitbox) polygon;
+        this.hitbox = new PolygonHitbox(polygon);
         position = p;
         velocityX = 0;
         velocityY = 0;
@@ -65,7 +66,7 @@ public class PhysicsObject implements Drawable {
      */
     public PhysicsObject(Polygon polygon, Util.Point p, double m, double initialVelocityX, double initialVelocityY) {
         this.visual = polygon;
-        this.hitbox = (PolygonHitbox) polygon;
+        this.hitbox = new PolygonHitbox(polygon);
         position = p;
         velocityX = initialVelocityX;
         velocityY = initialVelocityY;
@@ -73,10 +74,19 @@ public class PhysicsObject implements Drawable {
     }
 
     public void update(Simulation sim) {
-        velocityX += 0;
-        velocityY += Constants.gravityStep;
+        // velocityX += 0;
+        // velocityY += Constants.gravityStep;
 
         position = new Util.Point(position.x() + velocityX, position.y() + velocityY);
+        hitbox.setPosition(position);
+
+        for (PhysicsObject obj : sim.getObjects()) {
+            if (obj.equals(this)) continue;
+            
+            if (isColliding(obj)) {
+                System.out.println("COLLISION HAPPENING!");
+            }
+        }
         visual.setPosition(position);
     }
 

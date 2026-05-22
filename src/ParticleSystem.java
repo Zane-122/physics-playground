@@ -22,7 +22,7 @@ public class ParticleSystem {
 
         double vx = Math.cos(angle) * velocity;
         double vy = Math.sin(angle) * velocity;
-        PolygonHitbox hitbox = (PolygonHitbox) new Polygon(5, 8, spawnpoint);
+        PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
 
         particles.add(po);

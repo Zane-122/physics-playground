@@ -16,6 +16,8 @@ public class App {
             ps.addParticle();  // spawn one particle per frame
             ps.update(sim);
 
+            sim.updatePhysicsObjects();
+
             drawingPanel.repaint();
         });
 
