@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.util.ArrayList;
 
 public class ParticleSystem {
@@ -15,10 +16,10 @@ public class ParticleSystem {
         if (!panel.isMouseHeld() || panel.getMousePos() == null) return;
 
         Util.Point spawnpoint = panel.getMousePos();
-        Particle p = new Particle(spawnpoint);
+        Particle p = new Particle(spawnpoint, Color.getHSBColor((float) Math.random(), 1, 1));
 
-        double angle = -Math.toRadians(Math.random() * 60 + 240);
-        double velocity = Math.random() * 3 + 1;
+        double angle = -Math.toRadians(Math.random() * 360);
+        double velocity = Math.random() * 3 + 5;
 
         double vx = Math.cos(angle) * velocity;
         double vy = Math.sin(angle) * velocity;
@@ -41,6 +42,12 @@ public class ParticleSystem {
                 panel.removeObject(visual);
                 particles.remove(i);
             }
+        }
+    }
+
+    public void spawnParticles(int count) {
+        for (int i = 0; i < count; i++) {
+            addParticle();
         }
     }
 }
