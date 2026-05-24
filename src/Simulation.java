@@ -5,11 +5,10 @@ import java.util.List;
 public class Simulation {
     private List<PhysicsObject> objects = new ArrayList<>();
 
-    public void add(PhysicsObject obj) { 
-        objects.add(obj);
-    }
+    public void add(PhysicsObject obj) { objects.add(obj); }
     
     public void remove(PhysicsObject obj) { objects.remove(obj); }
+    
     public List<PhysicsObject> getObjects() { return Collections.unmodifiableList(objects); }
 
     public void updatePhysicsObjects() {
