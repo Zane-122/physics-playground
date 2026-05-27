@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 public class PhysicsObject implements Drawable {
     private Util.Point position;
@@ -9,6 +10,8 @@ public class PhysicsObject implements Drawable {
 
     private double mass;
     private PolygonHitbox hitbox;
+
+    private ArrayList<Component> components = new ArrayList<>();
 
     /**
      * Creates a new PhysicsObject with the given visual representation, position, and mass.
@@ -75,20 +78,17 @@ public class PhysicsObject implements Drawable {
     }
 
     public void update(Simulation sim) {
-        // velocityX += 0;
-        velocityY += sim.getGravityStep();
+        for (Component c : components) {
+            c.update(this, sim);
+        }
 
-        position = new Util.Point(position.x() + velocityX, position.y() + velocityY);
         hitbox.setPosition(position);
 
-        for (PhysicsObject obj : sim.getObjects()) {
-            if (obj.equals(this)) continue;
-            
-            if (isColliding(obj)) {
-                System.out.println("COLLISION HAPPENING!");
-            }
-        }
         visual.setPosition(position);
+    }
+
+    public void addComponent(Component c) {
+        components.add(c);
     }
 
     public Drawable getVisual() {
