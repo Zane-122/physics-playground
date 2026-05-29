@@ -82,8 +82,8 @@ public class PhysicsObject implements Drawable {
             c.update(this, sim);
         }
 
+        setPosition(new Util.Point(position.x() + velocityX, position.y() + velocityY));
         hitbox.setPosition(position);
-
         visual.setPosition(position);
     }
 
@@ -109,6 +109,27 @@ public class PhysicsObject implements Drawable {
     @Override
     public Util.Point getPosition() {
         return position;
+    }
+
+    public void setVelocity(double x, double y) {
+        velocityX = x;
+        velocityY = y;
+    }
+
+    public void setVelocityX(double value) {
+        velocityX = value;
+    }
+
+    public void setVelocityY(double value) {
+        velocityY = value;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public double getVelocityX() {
+        return velocityX;
     }
 
     public boolean isColliding(PhysicsObject po) {
