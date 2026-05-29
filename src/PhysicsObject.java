@@ -75,8 +75,8 @@ public class PhysicsObject implements Drawable {
     }
 
     public void update(Simulation sim) {
-        // velocityX += 0;
-        // velocityY += Constants.gravityStep;
+        velocityX += 0;
+        velocityY += Constants.gravityStep;
 
         position = new Util.Point(position.x() + velocityX, position.y() + velocityY);
         hitbox.setPosition(position);
