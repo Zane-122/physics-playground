@@ -30,12 +30,22 @@ public class Window {
     private static final Color TEXT_DARK = new Color(33, 37, 45);
     private static final Color INPUT_BORDER = new Color(198, 205, 217);
     private static final Color INPUT_ERROR_BORDER = new Color(196, 62, 62);
+    private static final Color INPUT_PENDING_BORDER = new Color(204, 140, 38);
+    private static final Color INPUT_SET_BORDER = SPAWN_ACTIVE_BACKGROUND;
     private static final Border INPUT_DEFAULT_BORDER = BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(INPUT_BORDER),
         new EmptyBorder(7, 9, 7, 9)
     );
     private static final Border INPUT_ERROR_STYLE = BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(INPUT_ERROR_BORDER),
+        new EmptyBorder(7, 9, 7, 9)
+    );
+    private static final Border INPUT_PENDING_STYLE = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(INPUT_PENDING_BORDER),
+        new EmptyBorder(7, 9, 7, 9)
+    );
+    private static final Border INPUT_SET_STYLE = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(INPUT_SET_BORDER),
         new EmptyBorder(7, 9, 7, 9)
     );
 
@@ -82,37 +92,50 @@ public class Window {
 
         JTextField gravityField = createNumberField(Double.toString(panel.getSimulation().getGravity()), 72);
         gravityField.setToolTipText("Gravity value");
-        JButton gravityButton = new JButton("Set Gravity");
-        styleButton(gravityButton, BUTTON_BACKGROUND);
+        JButton gravityButton = new JButton("Gravity Set");
+        styleButton(gravityButton, SPAWN_ACTIVE_BACKGROUND);
         gravityButton.setToolTipText("Apply the gravity number beside this button");
+        markApplied(gravityField);
         gravityButton.addActionListener(e -> {
             turnOffSpawn(spawnButton);
-            applyGravity(gravityField);
+            applyGravity(gravityField, gravityButton);
         });
         gravityField.addActionListener(e -> {
             turnOffSpawn(spawnButton);
-            applyGravity(gravityField);
+            applyGravity(gravityField, gravityButton);
         });
-        addSettingChangeListener(gravityField, spawnButton);
+        addSettingChangeListener(
+            gravityField,
+            spawnButton,
+            () -> markPending(gravityField),
+            () -> updateSettingButton(gravityButton, "Gravity Set", "Set Gravity", false)
+        );
 
         JTextField sidesField = createNumberField(Integer.toString(panel.getSpawnPolygonSides()), 54);
         sidesField.setToolTipText("Polygon sides");
-        JButton sidesButton = new JButton("Set Sides");
-        styleButton(sidesButton, BUTTON_BACKGROUND);
+        JButton sidesButton = new JButton("Sides Set");
+        styleButton(sidesButton, SPAWN_ACTIVE_BACKGROUND);
         sidesButton.setToolTipText("Apply the polygon side count beside this button");
+        markApplied(sidesField);
         sidesButton.addActionListener(e -> {
             turnOffSpawn(spawnButton);
-            updateSpawnSides(sidesField);
+            updateSpawnSides(sidesField, sidesButton);
         });
         sidesField.addActionListener(e -> {
             turnOffSpawn(spawnButton);
-            updateSpawnSides(sidesField);
+            updateSpawnSides(sidesField, sidesButton);
         });
-        addSettingChangeListener(sidesField, spawnButton);
+        addSettingChangeListener(
+            sidesField,
+            spawnButton,
+            () -> markPending(sidesField),
+            () -> updateSettingButton(sidesButton, "Sides Set", "Set Sides", false)
+        );
 
-        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField));
+        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton));
 
-        JLabel sizeLabel = createToolbarLabel("Size 40");
+        JLabel sizeLabel = createToolbarLabel("Size Set: 40");
+        sizeLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
         JSlider sizeSlider = new JSlider(10, 100, 40);
         sizeSlider.setPreferredSize(new Dimension(150, 32));
         sizeSlider.setMaximumSize(new Dimension(150, 32));
@@ -123,7 +146,7 @@ public class Window {
             int size = sizeSlider.getValue();
             turnOffSpawn(spawnButton);
             panel.setSpawnedPolygonRadius(size);
-            sizeLabel.setText("Size " + size);
+            sizeLabel.setText("Size Set: " + size);
         });
 
         toolbar.add(gravityButton);
@@ -143,29 +166,32 @@ public class Window {
         return toolbar;
     }
 
-    private void applyGravity(JTextField gravityField) {
+    private void applyGravity(JTextField gravityField, JButton gravityButton) {
         try {
             double gravity = Double.parseDouble(gravityField.getText().trim());
             if (!Double.isFinite(gravity)) {
                 markInvalid(gravityField);
+                updateSettingButton(gravityButton, "Gravity Set", "Set Gravity", false);
                 return;
             }
 
             panel.getSimulation().setGravity(gravity);
-            markValid(gravityField);
+            markApplied(gravityField);
+            updateSettingButton(gravityButton, "Gravity Set", "Set Gravity", true);
         } catch (NumberFormatException ex) {
             markInvalid(gravityField);
+            updateSettingButton(gravityButton, "Gravity Set", "Set Gravity", false);
         }
     }
 
-    private void handleSpawnToggle(JToggleButton spawnButton, JTextField sidesField) {
+    private void handleSpawnToggle(JToggleButton spawnButton, JTextField sidesField, JButton sidesButton) {
         if (!spawnButton.isSelected()) {
             panel.stopPolygonSpawn();
             updateSpawnButton(spawnButton);
             return;
         }
 
-        if (!updateSpawnSides(sidesField)) {
+        if (!updateSpawnSides(sidesField, sidesButton)) {
             spawnButton.setSelected(false);
             updateSpawnButton(spawnButton);
             return;
@@ -175,19 +201,22 @@ public class Window {
         updateSpawnButton(spawnButton);
     }
 
-    private boolean updateSpawnSides(JTextField sidesField) {
+    private boolean updateSpawnSides(JTextField sidesField, JButton sidesButton) {
         try {
             int sides = Integer.parseInt(sidesField.getText().trim());
             if (sides < 3) {
                 markInvalid(sidesField);
+                updateSettingButton(sidesButton, "Sides Set", "Set Sides", false);
                 return false;
             }
 
             panel.setSpawnPolygonSides(sides);
-            markValid(sidesField);
+            markApplied(sidesField);
+            updateSettingButton(sidesButton, "Sides Set", "Set Sides", true);
             return true;
         } catch (NumberFormatException ex) {
             markInvalid(sidesField);
+            updateSettingButton(sidesButton, "Sides Set", "Set Sides", false);
             return false;
         }
     }
@@ -211,7 +240,12 @@ public class Window {
         updateSpawnButton(spawnButton);
     }
 
-    private void addSettingChangeListener(JTextField field, JToggleButton spawnButton) {
+    private void addSettingChangeListener(
+        JTextField field,
+        JToggleButton spawnButton,
+        Runnable markChanged,
+        Runnable updateButton
+    ) {
         field.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -230,9 +264,21 @@ public class Window {
 
             private void settingChanged() {
                 turnOffSpawn(spawnButton);
-                markValid(field);
+                markChanged.run();
+                updateButton.run();
             }
         });
+    }
+
+    private void updateSettingButton(AbstractButton button, String setText, String pendingText, boolean applied) {
+        if (applied) {
+            button.setText(setText);
+            button.setBackground(SPAWN_ACTIVE_BACKGROUND);
+            return;
+        }
+
+        button.setText(pendingText);
+        button.setBackground(BUTTON_BACKGROUND);
     }
 
     private JTextField createNumberField(String value, int width) {
@@ -268,9 +314,14 @@ public class Window {
         ));
     }
 
-    private void markValid(JTextField field) {
-        field.setBorder(INPUT_DEFAULT_BORDER);
-        field.setToolTipText(null);
+    private void markApplied(JTextField field) {
+        field.setBorder(INPUT_SET_STYLE);
+        field.setToolTipText("This value is applied.");
+    }
+
+    private void markPending(JTextField field) {
+        field.setBorder(INPUT_PENDING_STYLE);
+        field.setToolTipText("Press the set button to apply this value.");
     }
 
     private void markInvalid(JTextField field) {
