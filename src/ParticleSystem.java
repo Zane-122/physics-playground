@@ -1,16 +1,11 @@
-import java.awt.Color;
 import java.util.ArrayList;
 
 public class ParticleSystem {
-    private ArrayList<PhysicsObject> particles;
     private ArrayList<ParticleEffect> particleEffects;
     private DrawingPanel panel;
-    private Util.Point origin;
 
     public ParticleSystem(DrawingPanel panel, Util.Point origin) {
         this.panel = panel;
-        this.origin = origin;
-        this.particles = new ArrayList<>();
         this.particleEffects = new ArrayList<>();
     }
 

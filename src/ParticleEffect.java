@@ -9,10 +9,11 @@ public class ParticleEffect {
     public ParticleEffect(DrawingPanel panel, Util.Point origin) {
         this.panel = panel;
         this.origin = origin;
+        this.particles = new ArrayList<>();
     }
 
     public void addParticle() {
-        Util.Point spawnpoint = panel.getMousePos();
+        Util.Point spawnpoint = origin;
         Particle p = new Particle(spawnpoint, Color.getHSBColor((float) Math.random(), 1, 1));
 
         double angle = -Math.toRadians(Math.random() * 360);
@@ -36,7 +37,7 @@ public class ParticleEffect {
             visual.fade();
 
             if (visual.isDead()) {
-                panel.removeObject(visual);
+                panel.removeObject(p);
                 particles.remove(i);
             }
         }

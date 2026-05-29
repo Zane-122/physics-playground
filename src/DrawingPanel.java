@@ -61,7 +61,9 @@ public class DrawingPanel extends JPanel {
     }
 
     public boolean wasClicked() {
-        return mouseClicked;
+        boolean clicked = mouseClicked;
+        mouseClicked = false;
+        return clicked;
     }
 
     public Util.Point getClickPosition() {
