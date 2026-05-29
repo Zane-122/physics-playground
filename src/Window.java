@@ -76,37 +76,41 @@ public class Window {
         ));
         toolbar.setBackground(TOOLBAR_BACKGROUND);
 
+        JToggleButton spawnButton = new JToggleButton("Spawn Objects");
+        styleButton(spawnButton, SPAWN_BACKGROUND);
+        spawnButton.setToolTipText("Toggle object spawning on or off");
+
         JTextField gravityField = createNumberField(Double.toString(panel.getSimulation().getGravity()), 72);
         gravityField.setToolTipText("Gravity value");
         JButton gravityButton = new JButton("Set Gravity");
         styleButton(gravityButton, BUTTON_BACKGROUND);
         gravityButton.setToolTipText("Apply the gravity number beside this button");
-        gravityButton.addActionListener(e -> applyGravity(gravityField));
-        gravityField.addActionListener(e -> applyGravity(gravityField));
+        gravityButton.addActionListener(e -> {
+            turnOffSpawn(spawnButton);
+            applyGravity(gravityField);
+        });
+        gravityField.addActionListener(e -> {
+            turnOffSpawn(spawnButton);
+            applyGravity(gravityField);
+        });
+        addSettingChangeListener(gravityField, spawnButton);
 
         JTextField sidesField = createNumberField(Integer.toString(panel.getSpawnPolygonSides()), 54);
         sidesField.setToolTipText("Polygon sides");
-        JToggleButton spawnButton = new JToggleButton("Spawn Object");
-        styleButton(spawnButton, SPAWN_BACKGROUND);
-        spawnButton.setToolTipText("Turn spawning on, then click the canvas to place polygons");
-        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField));
-        sidesField.addActionListener(e -> updateSpawnSides(sidesField));
-        sidesField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateSpawnSidesQuietly(sidesField);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateSpawnSidesQuietly(sidesField);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateSpawnSidesQuietly(sidesField);
-            }
+        JButton sidesButton = new JButton("Set Sides");
+        styleButton(sidesButton, BUTTON_BACKGROUND);
+        sidesButton.setToolTipText("Apply the polygon side count beside this button");
+        sidesButton.addActionListener(e -> {
+            turnOffSpawn(spawnButton);
+            updateSpawnSides(sidesField);
         });
+        sidesField.addActionListener(e -> {
+            turnOffSpawn(spawnButton);
+            updateSpawnSides(sidesField);
+        });
+        addSettingChangeListener(sidesField, spawnButton);
+
+        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField));
 
         JLabel sizeLabel = createToolbarLabel("Size 40");
         JSlider sizeSlider = new JSlider(10, 100, 40);
@@ -117,6 +121,7 @@ public class Window {
         sizeSlider.setToolTipText("Shape size");
         sizeSlider.addChangeListener(e -> {
             int size = sizeSlider.getValue();
+            turnOffSpawn(spawnButton);
             panel.setSpawnedPolygonRadius(size);
             sizeLabel.setText("Size " + size);
         });
@@ -125,13 +130,15 @@ public class Window {
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(gravityField);
         toolbar.add(Box.createHorizontalStrut(12));
-        toolbar.add(spawnButton);
+        toolbar.add(sidesButton);
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(sidesField);
         toolbar.add(Box.createHorizontalStrut(16));
         toolbar.add(sizeLabel);
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(sizeSlider);
+        toolbar.add(Box.createHorizontalStrut(16));
+        toolbar.add(spawnButton);
 
         return toolbar;
     }
@@ -185,18 +192,6 @@ public class Window {
         }
     }
 
-    private void updateSpawnSidesQuietly(JTextField sidesField) {
-        try {
-            int sides = Integer.parseInt(sidesField.getText().trim());
-            if (sides >= 3) {
-                panel.setSpawnPolygonSides(sides);
-                markValid(sidesField);
-            }
-        } catch (NumberFormatException ex) {
-            // Wait for the user to finish editing before showing an error.
-        }
-    }
-
     private void updateSpawnButton(JToggleButton spawnButton) {
         if (spawnButton.isSelected()) {
             spawnButton.setText("Spawning");
@@ -204,8 +199,40 @@ public class Window {
             return;
         }
 
-        spawnButton.setText("Spawn Object");
+        spawnButton.setText("Spawn Objects");
         spawnButton.setBackground(SPAWN_BACKGROUND);
+    }
+
+    private void turnOffSpawn(JToggleButton spawnButton) {
+        if (!spawnButton.isSelected()) return;
+
+        spawnButton.setSelected(false);
+        panel.stopPolygonSpawn();
+        updateSpawnButton(spawnButton);
+    }
+
+    private void addSettingChangeListener(JTextField field, JToggleButton spawnButton) {
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                settingChanged();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                settingChanged();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                settingChanged();
+            }
+
+            private void settingChanged() {
+                turnOffSpawn(spawnButton);
+                markValid(field);
+            }
+        });
     }
 
     private JTextField createNumberField(String value, int width) {
