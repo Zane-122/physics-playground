@@ -15,7 +15,7 @@ public class App {
         sim.add(obj);
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticle();  // spawn one particle per frame
+            ps.addParticleEffect();
             ps.update(sim);
 
             sim.updatePhysicsObjects();

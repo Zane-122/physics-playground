@@ -1,18 +1,13 @@
 import java.util.ArrayList;
 
 public class ParticleSystem {
-    private ArrayList<PhysicsObject> particles;
+    private ArrayList<ParticleEffect> particleEffects;
     private DrawingPanel panel;
-    private Util.Point origin;
 
     public ParticleSystem(DrawingPanel panel, Util.Point origin) {
         this.panel = panel;
-        this.origin = origin;
-        this.particles = new ArrayList<>();
+        this.particleEffects = new ArrayList<>();
     }
-    
-    public void addParticle() {
-        if (!panel.isMouseHeld() || panel.getMousePos() == null) return;
 
         Util.Point spawnpoint = panel.getMousePos();
         Particle p = new Particle(spawnpoint);
@@ -29,20 +24,18 @@ public class ParticleSystem {
 
         particles.add(po);
         panel.addObject(po);
+    public void addParticleEffect() {
+        if (panel.wasClicked()) {
+            Util.Point effectPosition = panel.getClickPosition();
+            ParticleEffect effect = new ParticleEffect(panel, effectPosition);
+            particleEffects.add(effect);
+        }
     }
 
-    public void update(Simulation sim) {  
-        for (int i = particles.size() - 1; i >= 0; i--) {
-            PhysicsObject p = particles.get(i);
-            Particle visual = (Particle) p.getVisual();
-
-            p.update(sim);
-            visual.fade();
-
-            if (visual.isDead()) {
-                panel.removeObject(visual);
-                particles.remove(i);
-            }
+    public void update(Simulation sim) {
+        for (ParticleEffect effect : particleEffects) {
+            effect.addParticle();
+            effect.update(sim);
         }
     }
 }
