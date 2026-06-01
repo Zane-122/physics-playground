@@ -7,6 +7,8 @@ public class DrawingPanel extends JPanel {
     private ArrayList<Drawable> drawables = new ArrayList<>();
     private Util.Point mousePosition = null;
     private boolean mouseHeld = false;
+    private boolean mouseClicked = false;
+    private Util.Point clickPosition = null;
     private Simulation sim;
     private int spawnPolygonSides = 5;
     private boolean polygonSpawnActive = false;
@@ -33,19 +35,24 @@ public class DrawingPanel extends JPanel {
             }
 
             @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                mouseClicked = true;
+                clickPosition = new Util.Point(e.getX(), e.getY());
+            }
+
+            @Override
             public void mouseDragged(java.awt.event.MouseEvent e) {
                 if (mouseHeld) {
                     mousePosition = new Util.Point(e.getX(), e.getY());
                 }
             }
-         };
+        };
 
         addMouseListener(ma);
         addMouseMotionListener(ma);
 
-         this.sim = sim;
+        this.sim = sim;
     }
-
 
     public Util.Point getMousePos() {
         return mousePosition;
@@ -61,6 +68,16 @@ public class DrawingPanel extends JPanel {
 
     public void removeObject(Drawable d) {
         drawables.remove(d);
+    }
+
+    public boolean wasClicked() {
+        boolean clicked = mouseClicked;
+        mouseClicked = false;
+        return clicked;
+    }
+
+    public Util.Point getClickPosition() {
+        return clickPosition;
     }
 
     public Simulation getSimulation() {
@@ -92,7 +109,10 @@ public class DrawingPanel extends JPanel {
 
     private void spawnPolygon(Util.Point position) {
         Polygon polygon = new Polygon(spawnPolygonSides, spawnedPolygonRadius, position);
-        sim.add(new PhysicsObject(polygon, position, spawnedPolygonMass));
+        PhysicsObject object = new PhysicsObject(polygon, position, spawnedPolygonMass);
+        object.addComponent(new Gravity());
+        object.addComponent(new Collision());
+        sim.add(object);
         repaint();
     }
 

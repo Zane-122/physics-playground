@@ -19,7 +19,7 @@ public class App {
         addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticle();  // spawn one particle per frame
+            ps.addParticleEffect();
             ps.update(sim);
 
             sim.updatePhysicsObjects();
