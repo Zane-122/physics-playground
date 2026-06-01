@@ -9,18 +9,22 @@ public class ParticleSystem {
         this.particleEffects = new ArrayList<>();
     }
 
-    public void addParticleEffect() {
-        if (panel.wasClicked()) {
-            Util.Point effectPosition = panel.getClickPosition();
-            ParticleEffect effect = new ParticleEffect(panel, effectPosition);
-            particleEffects.add(effect);
+    public void spawnAndUpdateParticles(Simulation sim) {
+        // if (panel.wasClicked()) {
+        //     Util.Point effectPosition = panel.getClickPosition();
+        //     ParticleEffect effect = new ParticleEffect(panel, effectPosition);
+        //     particleEffects.add(effect);
+        // }
+
+        for (ParticleEffect effect : particleEffects) {
+            effect.addParticle();
+            effect.updateParticles(sim);
         }
     }
 
-    public void update(Simulation sim) {
+    public void resolveParticleCollisions(Simulation sim) {
         for (ParticleEffect effect : particleEffects) {
-            effect.addParticle();
-            effect.update(sim);
+            effect.resolveCollisions(sim);
         }
     }
 }

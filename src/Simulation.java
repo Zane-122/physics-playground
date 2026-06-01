@@ -18,9 +18,18 @@ public class Simulation {
 
     public double getGravityStep() { return gravity * Constants.timeStep; }
 
-    public void updatePhysicsObjects() {
+    public void update(ParticleSystem particleSystem) {
+        particleSystem.spawnAndUpdateParticles(this);
+
         for (PhysicsObject obj : objects) {
             obj.update(this);
+        }
+
+        for (int i = 0; i < Constants.collisionIterations; i++) {
+            for (PhysicsObject obj : objects) {
+                obj.resolveCollisions(this);
+            }
+            particleSystem.resolveParticleCollisions(this);
         }
     }
 }

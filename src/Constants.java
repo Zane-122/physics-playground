@@ -9,4 +9,10 @@ public class Constants {
     public static final double windowHeight = 600;
 
     public static final float particleLifespan = 150.0f;
+
+    /** 0 = no bounce, 1 = perfectly elastic */
+    public static final double restitution = 0.35;
+
+    public static final double separationSlop = 2.0;
+    public static final int collisionIterations = 3;
 }

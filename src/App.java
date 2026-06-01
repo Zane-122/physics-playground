@@ -19,11 +19,7 @@ public class App {
         addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticleEffect();
-            ps.update(sim);
-
-            sim.updatePhysicsObjects();
-
+            sim.update(ps);
             drawingPanel.repaint();
         });
 
@@ -33,8 +29,8 @@ public class App {
     private static void addBorderWall(Simulation sim, double size, Util.Point center) {
         Polygon square = new Polygon(4, size, center);
         PhysicsObject wall = new PhysicsObject(square, center, 0);
+        wall.setStatic(true);
         wall.addComponent(new Freeze());
-        wall.addComponent(new Collision());
         sim.add(wall);
     }
 }
