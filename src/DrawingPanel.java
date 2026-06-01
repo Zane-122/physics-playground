@@ -8,15 +8,16 @@ public class DrawingPanel extends JPanel {
     private Util.Point mousePosition = null;
     private boolean mouseHeld = false;
     private Simulation sim;
-    private Integer spawnPolygonSides = null;
-    private static final double spawnedPolygonRadius = 40;
+    private int spawnPolygonSides = 5;
+    private boolean polygonSpawnActive = false;
+    private double spawnedPolygonRadius = 40;
     private static final double spawnedPolygonMass = 1;
 
     public DrawingPanel(Simulation sim) {
         MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
-                if (spawnPolygonSides != null) {
+                if (polygonSpawnActive) {
                     spawnPolygon(new Util.Point(e.getX(), e.getY()));
                     mouseHeld = false;
                     return;
@@ -68,15 +69,29 @@ public class DrawingPanel extends JPanel {
 
     public void startPolygonSpawn(int sides) {
         spawnPolygonSides = sides;
+        polygonSpawnActive = true;
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
 
-    private void spawnPolygon(Util.Point position) {
-        int sides = spawnPolygonSides;
-        spawnPolygonSides = null;
+    public void stopPolygonSpawn() {
+        polygonSpawnActive = false;
         setCursor(Cursor.getDefaultCursor());
+    }
 
-        Polygon polygon = new Polygon(sides, spawnedPolygonRadius, position);
+    public int getSpawnPolygonSides() {
+        return spawnPolygonSides;
+    }
+
+    public void setSpawnPolygonSides(int sides) {
+        spawnPolygonSides = sides;
+    }
+
+    public void setSpawnedPolygonRadius(double radius) {
+        spawnedPolygonRadius = radius;
+    }
+
+    private void spawnPolygon(Util.Point position) {
+        Polygon polygon = new Polygon(spawnPolygonSides, spawnedPolygonRadius, position);
         sim.add(new PhysicsObject(polygon, position, spawnedPolygonMass));
         repaint();
     }
