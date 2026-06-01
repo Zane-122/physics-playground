@@ -89,6 +89,7 @@ public class PhysicsObject implements Drawable {
 
     public void addComponent(Component c) {
         components.add(c);
+        c.initialize(this);
     }
 
     public Drawable getVisual() {

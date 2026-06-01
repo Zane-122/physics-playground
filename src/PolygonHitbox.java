@@ -40,7 +40,6 @@ public class PolygonHitbox extends Polygon {
         }
         return false;
     }
-
     private static double[] project(Util.Point[] poly, double axisX, double axisY) {
         double min = axisX * poly[0].x() + axisY * poly[0].y();
         double max = min;

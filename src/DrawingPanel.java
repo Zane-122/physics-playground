@@ -78,6 +78,8 @@ public class DrawingPanel extends JPanel {
 
     public Util.Point getClickPosition() {
         return clickPosition;
+    }
+
     public Simulation getSimulation() {
         return sim;
     }

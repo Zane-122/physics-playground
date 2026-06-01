@@ -9,10 +9,14 @@ public class App {
         window.display();
 
         ParticleSystem ps = new ParticleSystem(drawingPanel, new Util.Point(Constants.windowWidth / 2, Constants.windowHeight / 2));
-        PhysicsObject obj = new PhysicsObject(new Polygon(4, 50, new Util.Point(100, 100)), new Util.Point(100, 100), 1);
-        obj.addComponent(new Gravity());
-        obj.addComponent(new Collision());
-        sim.add(obj);
+        double w = Constants.windowWidth;
+        double h = Constants.windowHeight;
+        double borderSize = Math.max(w, h);
+
+        addBorderWall(sim, borderSize, new Util.Point(w / 2, -borderSize));
+        addBorderWall(sim, borderSize, new Util.Point(w / 2, h + borderSize));
+        addBorderWall(sim, borderSize, new Util.Point(-borderSize, h / 2));
+        addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
             ps.addParticleEffect();
@@ -24,5 +28,13 @@ public class App {
         });
 
         timer.start();
+    }
+
+    private static void addBorderWall(Simulation sim, double size, Util.Point center) {
+        Polygon square = new Polygon(4, size, center);
+        PhysicsObject wall = new PhysicsObject(square, center, 0);
+        wall.addComponent(new Freeze());
+        wall.addComponent(new Collision());
+        sim.add(wall);
     }
 }
