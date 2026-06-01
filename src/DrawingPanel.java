@@ -92,7 +92,10 @@ public class DrawingPanel extends JPanel {
 
     private void spawnPolygon(Util.Point position) {
         Polygon polygon = new Polygon(spawnPolygonSides, spawnedPolygonRadius, position);
-        sim.add(new PhysicsObject(polygon, position, spawnedPolygonMass));
+        PhysicsObject object = new PhysicsObject(polygon, position, spawnedPolygonMass);
+        object.addComponent(new Gravity());
+        object.addComponent(new Collision());
+        sim.add(object);
         repaint();
     }
 

@@ -24,6 +24,8 @@ public class ParticleSystem {
         double vy = Math.sin(angle) * velocity;
         PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
+        po.addComponent(new Gravity());
+        po.addComponent(new Collision());
 
         particles.add(po);
         panel.addObject(po);
