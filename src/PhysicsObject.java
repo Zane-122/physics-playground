@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 public class PhysicsObject implements Drawable {
     private Util.Point position;
@@ -9,6 +10,8 @@ public class PhysicsObject implements Drawable {
 
     private double mass;
     private PolygonHitbox hitbox;
+
+    private ArrayList<Component> components = new ArrayList<>();
 
     /**
      * Creates a new PhysicsObject with the given visual representation, position, and mass.
@@ -75,20 +78,17 @@ public class PhysicsObject implements Drawable {
     }
 
     public void update(Simulation sim) {
-        velocityX += 0;
-        velocityY += Constants.gravityStep;
-
-        position = new Util.Point(position.x() + velocityX, position.y() + velocityY);
-        hitbox.setPosition(position);
-
-        for (PhysicsObject obj : sim.getObjects()) {
-            if (obj.equals(this)) continue;
-            
-            if (isColliding(obj)) {
-                System.out.println("COLLISION HAPPENING!");
-            }
+        for (Component c : components) {
+            c.update(this, sim);
         }
+
+        setPosition(new Util.Point(position.x() + velocityX, position.y() + velocityY));
+        hitbox.setPosition(position);
         visual.setPosition(position);
+    }
+
+    public void addComponent(Component c) {
+        components.add(c);
     }
 
     public Drawable getVisual() {
@@ -109,6 +109,27 @@ public class PhysicsObject implements Drawable {
     @Override
     public Util.Point getPosition() {
         return position;
+    }
+
+    public void setVelocity(double x, double y) {
+        velocityX = x;
+        velocityY = y;
+    }
+
+    public void setVelocityX(double value) {
+        velocityX = value;
+    }
+
+    public void setVelocityY(double value) {
+        velocityY = value;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public double getVelocityX() {
+        return velocityX;
     }
 
     public boolean isColliding(PhysicsObject po) {
