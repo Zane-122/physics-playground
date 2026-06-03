@@ -23,12 +23,14 @@ public class ParticleEffect {
         double vy = Math.sin(angle) * velocity;
         PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
+        po.setParticle(true);
+        po.addComponent(new Collision());
 
         particles.add(po);
         panel.addObject(po);
     }
 
-    public void update(Simulation sim) {
+    public void updateParticles(Simulation sim) {
         for (int i = particles.size() - 1; i >= 0; i--) {
             PhysicsObject p = particles.get(i);
             Particle visual = (Particle) p.getVisual();
@@ -40,6 +42,12 @@ public class ParticleEffect {
                 panel.removeObject(p);
                 particles.remove(i);
             }
+        }
+    }
+
+    public void resolveCollisions(Simulation sim) {
+        for (PhysicsObject p : particles) {
+            p.resolveCollisions(sim);
         }
     }
 }
