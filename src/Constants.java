@@ -8,7 +8,7 @@ public class Constants {
     public static final double windowWidth = 800;
     public static final double windowHeight = 600;
 
-    public static final float particleLifespan = 150.0f;
+    public static final double particleLifespan = 20;
 
     /** 0 = no bounce, 1 = perfectly elastic */
     public static final double restitution = 0.35;
