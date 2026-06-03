@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class ParticleSystem {
-    private ArrayList<ParticleEffect> particleEffects;
+    public ArrayList<ParticleEffect> particleEffects;
     private DrawingPanel panel;
 
     public ParticleSystem(DrawingPanel panel, Util.Point origin) {

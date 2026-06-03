@@ -12,7 +12,8 @@ public class App {
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
         double borderSize = Math.max(w, h);
-
+        sim.addForce(new Pull(new Util.Point(w / 2, h / 2), 2000));
+        ps.particleEffects.add(new ParticleEffect(drawingPanel, new Util.Point(w / 2, h / 2)));
         addBorderWall(sim, borderSize, new Util.Point(w / 2, -borderSize));
         addBorderWall(sim, borderSize, new Util.Point(w / 2, h + borderSize));
         addBorderWall(sim, borderSize, new Util.Point(-borderSize, h / 2));
