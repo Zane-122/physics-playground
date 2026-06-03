@@ -24,7 +24,7 @@ public class ParticleEffect {
         PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
         po.setParticle(true);
-        po.addComponent(new Collision());
+        po.addComponent(new Gravity());
 
         particles.add(po);
         panel.addObject(po);
