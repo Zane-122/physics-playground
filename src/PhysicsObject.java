@@ -16,6 +16,8 @@ public class PhysicsObject implements Drawable {
     private boolean particle;
     private boolean staticBody;
 
+    private Color color = Color.RED;
+
     private ArrayList<Component> components = new ArrayList<>();
 
     /**
@@ -58,12 +60,13 @@ public class PhysicsObject implements Drawable {
      * @param p
      * @param m
      */
-    public PhysicsObject(Polygon polygon, Util.Point p, double m) {
+    public PhysicsObject(Polygon polygon, Util.Point p, double m, Color color) {
         this.visual = polygon;
         this.hitbox = new PolygonHitbox(polygon);
         position = p;
         velocityX = 0;
         velocityY = 0;
+        this.color = color;
         mass = m;
         initMomentOfInertia();
     }
@@ -140,8 +143,10 @@ public class PhysicsObject implements Drawable {
 
     @Override
     public final void draw(Graphics g) {
-        g.setColor(Color.RED);
+        Color oldColor = g.getColor();
+        g.setColor(color);
         visual.draw(g);
+        g.setColor(oldColor);
     }
 
     @Override

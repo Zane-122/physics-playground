@@ -38,7 +38,7 @@ public class App {
 
     private static void addBorderWall(Simulation sim, double size, Util.Point center) {
         Polygon square = new Polygon(4, size, center, 0);
-        PhysicsObject wall = new PhysicsObject(square, center, 0);
+        PhysicsObject wall = new PhysicsObject(square, center, 0, Color.RED);
         wall.setRotation(Math.PI/4);
         wall.setStatic(true);
         wall.addComponent(new Freeze());
