@@ -8,5 +8,5 @@ public class Constants {
     public static final double windowWidth = 800;
     public static final double windowHeight = 600;
 
-    public static final float particleLifespan = 150.0f;
+    public static final double particleLifespan = 50;
 }

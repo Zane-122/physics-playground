@@ -3,12 +3,14 @@ import java.awt.Graphics;
 
 public class Particle implements Drawable {
     private Util.Point position;
-    private float lifespan;
+    private double lifespan;
+    private final double initialLifespan;
     private Color color;
 
-    public Particle(Util.Point p, Color c) {
+    public Particle (Util.Point p, Color c, double lifespan) {
         position = p;
-        lifespan = Constants.particleLifespan;
+        this.lifespan = lifespan;
+        this.initialLifespan = lifespan;
         color = c;
     }
 
@@ -20,9 +22,17 @@ public class Particle implements Drawable {
         lifespan -= 1.0f;
     }
 
+    private int currentAlpha() {
+        if (initialLifespan <= 0) {
+            return 0;
+        }
+        double lifeRatio = Math.max(0.0, Math.min(1.0, lifespan / initialLifespan));
+        return (int) Math.round(255 * (1 - Math.pow(1 - lifeRatio, 3)));
+    }
+
     @Override
     public void draw(Graphics g) {
-        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) lifespan));
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha()));
         g.fillOval((int) position.x() - 5, (int) position.y(), 8, 8);
     }
 

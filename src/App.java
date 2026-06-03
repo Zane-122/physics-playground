@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 import javax.swing.Timer;
 
 public class App {
@@ -8,7 +10,7 @@ public class App {
         Window window = new Window(Constants.windowWidth, Constants.windowHeight, "Physics Playground", drawingPanel);
         window.display();
 
-        ParticleSystem ps = new ParticleSystem(drawingPanel, new Util.Point(Constants.windowWidth / 2, Constants.windowHeight / 2));
+        ParticleSystem ps = new ParticleSystem(drawingPanel, new Util.Point(Constants.windowWidth / 2, Constants.windowHeight / 2), 10);
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
         double borderSize = Math.max(w, h);
@@ -19,7 +21,7 @@ public class App {
         addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticleEffect();
+            ps.addParticleEffect(Color.red, Constants.particleLifespan, 10);
             ps.update(sim);
 
             sim.updatePhysicsObjects();
