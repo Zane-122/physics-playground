@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.awt.Color;
+import java.util.ArrayList;
 
 public class ParticleSystem {
     public ArrayList<ParticleEffect> particleEffects;
@@ -34,7 +34,7 @@ public class ParticleSystem {
             for (int i = 0; i < particlesToSpawn; i++) {
                 effect.addParticle();
             }
-            effect.update(sim);
+            effect.updateParticles(sim);
         }
     }
 

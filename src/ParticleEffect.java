@@ -43,9 +43,9 @@ public class ParticleEffect {
         Particle p = new Particle(spawnpoint, color, lifespan);
 
         double angle = -Math.toRadians(Math.random() * 360);
-        double velocity = Math.random() * 3 + 5;
+        double velocity = Math.random() * 11 + 6;
 
-        double vx = Math.cos(angle) * velocity;
+        double vx = Math.cos(angle) * velocity ;
         double vy = Math.sin(angle) * velocity;
         PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
