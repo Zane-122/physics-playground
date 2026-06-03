@@ -219,4 +219,9 @@ public class PhysicsObject implements Drawable {
     public boolean isColliding(PhysicsObject po) {
         return hitbox.isColliding(po.hitbox);
     }
+
+    public void setRotation(double rotation) {
+        angle = rotation;
+        syncTransform();
+    }
 }

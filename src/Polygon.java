@@ -17,6 +17,13 @@ public class Polygon implements Drawable {
         this.position = position;
     }
 
+    public Polygon(int sides, double radius, Util.Point position, double rotation) {
+        this.sides = sides;
+        this.radius = radius;
+        this.position = position;
+        this.rotation = rotation;
+    }
+
     public Polygon(Polygon polygon) {
         this.sides = polygon.getSides();
         this.radius = polygon.getRadius();
