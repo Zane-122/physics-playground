@@ -13,7 +13,12 @@ public class DrawingPanel extends JPanel {
     private int spawnPolygonSides = 5;
     private boolean polygonSpawnActive = false;
     private double spawnedPolygonRadius = 40;
-    private static final double spawnedPolygonMass = 1;
+    private boolean explosionSpawnActive = false;
+    private double explosionStrength = 2000;
+    private Util.Point pendingExplosionPosition = null;
+    private static final int defaultPolygonSides = 5;
+    private static final double defaultPolygonRadius = 40;
+    private static final double minimumSpawnedPolygonMass = 0.25;
 
     public DrawingPanel(Simulation sim) {
         MouseAdapter ma = new MouseAdapter() {
@@ -21,6 +26,12 @@ public class DrawingPanel extends JPanel {
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (polygonSpawnActive) {
                     spawnPolygon(new Util.Point(e.getX(), e.getY()));
+                    mouseHeld = false;
+                    return;
+                }
+
+                if (explosionSpawnActive) {
+                    pendingExplosionPosition = new Util.Point(e.getX(), e.getY());
                     mouseHeld = false;
                     return;
                 }
@@ -87,6 +98,7 @@ public class DrawingPanel extends JPanel {
     public void startPolygonSpawn(int sides) {
         spawnPolygonSides = sides;
         polygonSpawnActive = true;
+        explosionSpawnActive = false;
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
 
@@ -107,13 +119,50 @@ public class DrawingPanel extends JPanel {
         spawnedPolygonRadius = radius;
     }
 
+    public void setExplosionSpawnActive(boolean active) {
+        explosionSpawnActive = active;
+        if (active) {
+            polygonSpawnActive = false;
+            setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            return;
+        }
+
+        if (!polygonSpawnActive) {
+            setCursor(Cursor.getDefaultCursor());
+        }
+    }
+
+    public void setExplosionStrength(double strength) {
+        explosionStrength = strength;
+    }
+
+    public double getExplosionStrength() {
+        return explosionStrength;
+    }
+
+    public Util.Point consumeExplosionSpawnPosition() {
+        Util.Point position = pendingExplosionPosition;
+        pendingExplosionPosition = null;
+        return position;
+    }
+
     private void spawnPolygon(Util.Point position) {
         Polygon polygon = new Polygon(spawnPolygonSides, spawnedPolygonRadius, position);
-        PhysicsObject object = new PhysicsObject(polygon, position, spawnedPolygonMass);
+        PhysicsObject object = new PhysicsObject(polygon, position, calculateSpawnedPolygonMass());
         object.addComponent(new Gravity());
         object.addComponent(new Collision());
         sim.add(object);
         repaint();
+    }
+
+    private double calculateSpawnedPolygonMass() {
+        double defaultArea = calculateRegularPolygonArea(defaultPolygonSides, defaultPolygonRadius);
+        double spawnedArea = calculateRegularPolygonArea(spawnPolygonSides, spawnedPolygonRadius);
+        return Math.max(minimumSpawnedPolygonMass, spawnedArea / defaultArea);
+    }
+
+    private double calculateRegularPolygonArea(int sides, double radius) {
+        return 0.5 * sides * radius * radius * Math.sin(2 * Math.PI / sides);
     }
 
     @Override

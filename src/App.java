@@ -2,6 +2,8 @@ import java.awt.Color;
 import javax.swing.Timer;
 
 public class App {
+    private static final int explosionParticleCount = 90;
+
     public static void main(String[] args) throws Exception {
         Simulation sim = new Simulation();
         DrawingPanel drawingPanel = new DrawingPanel(sim);
@@ -13,7 +15,6 @@ public class App {
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
         double borderSize = Math.max(w, h);
-        sim.addForce(new Pull(new Util.Point(w / 2, h / 2), 2000));
 
         addBorderWall(sim, borderSize, new Util.Point(w / 2, -borderSize));
         addBorderWall(sim, borderSize, new Util.Point(w / 2, h + borderSize));
@@ -21,7 +22,14 @@ public class App {
         addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
-            ps.addParticleEffect(Color.red, Constants.particleLifespan, 90);
+            Util.Point explosionPosition = drawingPanel.consumeExplosionSpawnPosition();
+            if (explosionPosition != null) {
+                sim.addForce(new Explosion(
+                    explosionPosition,
+                    drawingPanel.getExplosionStrength()
+                ));
+                ps.addParticleEffect(explosionPosition, Color.red, Constants.particleLifespan, explosionParticleCount);
+            }
 
             ps.update(sim);
             sim.update();

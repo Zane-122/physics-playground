@@ -7,9 +7,11 @@ import java.awt.Font;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -69,26 +71,33 @@ public class Window {
             frame.setLayout(new BorderLayout());
             panel.setBackground(PANEL_BACKGROUND);
 
-            JToolBar toolbar = createToolbar();
+            JPanel toolbar = createToolbar();
             frame.add(toolbar, BorderLayout.NORTH);
             frame.add(panel, BorderLayout.CENTER);
             frame.setVisible(true);
         });
     }
 
-    private JToolBar createToolbar() {
-        JToolBar toolbar = new JToolBar();
-        toolbar.setFloatable(false);
-        toolbar.setOpaque(true);
-        toolbar.setBorder(BorderFactory.createCompoundBorder(
+    private JPanel createToolbar() {
+        JPanel toolbarPanel = new JPanel();
+        toolbarPanel.setLayout(new BoxLayout(toolbarPanel, BoxLayout.Y_AXIS));
+        toolbarPanel.setOpaque(true);
+        toolbarPanel.setBackground(TOOLBAR_BACKGROUND);
+        toolbarPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 230, 238)),
-            new EmptyBorder(8, 10, 8, 10)
+            new EmptyBorder(4, 0, 4, 0)
         ));
-        toolbar.setBackground(TOOLBAR_BACKGROUND);
+
+        JToolBar settingsToolbar = createToolbarRow();
+        JToolBar spawnToolbar = createToolbarRow();
 
         JToggleButton spawnButton = new JToggleButton("Spawn Objects");
         styleButton(spawnButton, SPAWN_BACKGROUND);
         spawnButton.setToolTipText("Toggle object spawning on or off");
+
+        JToggleButton explosionButton = new JToggleButton("Spawn Explosion");
+        styleButton(explosionButton, SPAWN_BACKGROUND);
+        explosionButton.setToolTipText("Toggle explosion spawning on or off");
 
         JTextField gravityField = createNumberField(Double.toString(panel.getSimulation().getGravity()), 72);
         gravityField.setToolTipText("Gravity value");
@@ -132,7 +141,7 @@ public class Window {
             () -> updateSettingButton(sidesButton, "Sides Set", "Set Sides", false)
         );
 
-        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton));
+        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton, explosionButton));
 
         JLabel sizeLabel = createToolbarLabel("Size Set: 40");
         sizeLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
@@ -149,20 +158,54 @@ public class Window {
             sizeLabel.setText("Size Set: " + size);
         });
 
-        toolbar.add(gravityButton);
-        toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(gravityField);
-        toolbar.add(Box.createHorizontalStrut(12));
-        toolbar.add(sidesButton);
-        toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(sidesField);
-        toolbar.add(Box.createHorizontalStrut(16));
-        toolbar.add(sizeLabel);
-        toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(sizeSlider);
-        toolbar.add(Box.createHorizontalStrut(16));
-        toolbar.add(spawnButton);
+        JLabel explosionLabel = createToolbarLabel("Push 2000");
+        JSlider explosionSlider = new JSlider(500, 8000, 2000);
+        explosionSlider.setPreferredSize(new Dimension(150, 32));
+        explosionSlider.setMaximumSize(new Dimension(150, 32));
+        explosionSlider.setOpaque(false);
+        explosionSlider.setFocusable(false);
+        explosionSlider.setToolTipText("Explosion push strength");
+        explosionSlider.addChangeListener(e -> {
+            int strength = explosionSlider.getValue();
+            turnOffSpawn(spawnButton);
+            panel.setExplosionStrength(strength);
+            explosionLabel.setText("Push " + strength);
+        });
 
+        explosionButton.addActionListener(e -> handleExplosionToggle(explosionButton, spawnButton));
+
+        settingsToolbar.add(gravityButton);
+        settingsToolbar.add(Box.createHorizontalStrut(6));
+        settingsToolbar.add(gravityField);
+        settingsToolbar.add(Box.createHorizontalStrut(12));
+        settingsToolbar.add(sidesButton);
+        settingsToolbar.add(Box.createHorizontalStrut(6));
+        settingsToolbar.add(sidesField);
+        settingsToolbar.add(Box.createHorizontalStrut(16));
+        settingsToolbar.add(sizeLabel);
+        settingsToolbar.add(Box.createHorizontalStrut(6));
+        settingsToolbar.add(sizeSlider);
+
+        spawnToolbar.add(spawnButton);
+        spawnToolbar.add(Box.createHorizontalStrut(16));
+        spawnToolbar.add(explosionButton);
+        spawnToolbar.add(Box.createHorizontalStrut(6));
+        spawnToolbar.add(explosionLabel);
+        spawnToolbar.add(Box.createHorizontalStrut(6));
+        spawnToolbar.add(explosionSlider);
+
+        toolbarPanel.add(settingsToolbar);
+        toolbarPanel.add(spawnToolbar);
+
+        return toolbarPanel;
+    }
+
+    private JToolBar createToolbarRow() {
+        JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        toolbar.setOpaque(true);
+        toolbar.setBackground(TOOLBAR_BACKGROUND);
+        toolbar.setBorder(new EmptyBorder(4, 10, 4, 10));
         return toolbar;
     }
 
@@ -184,12 +227,19 @@ public class Window {
         }
     }
 
-    private void handleSpawnToggle(JToggleButton spawnButton, JTextField sidesField, JButton sidesButton) {
+    private void handleSpawnToggle(
+        JToggleButton spawnButton,
+        JTextField sidesField,
+        JButton sidesButton,
+        JToggleButton explosionButton
+    ) {
         if (!spawnButton.isSelected()) {
             panel.stopPolygonSpawn();
             updateSpawnButton(spawnButton);
             return;
         }
+
+        turnOffExplosion(explosionButton);
 
         if (!updateSpawnSides(sidesField, sidesButton)) {
             spawnButton.setSelected(false);
@@ -199,6 +249,18 @@ public class Window {
 
         panel.startPolygonSpawn(panel.getSpawnPolygonSides());
         updateSpawnButton(spawnButton);
+    }
+
+    private void handleExplosionToggle(JToggleButton explosionButton, JToggleButton spawnButton) {
+        if (!explosionButton.isSelected()) {
+            panel.setExplosionSpawnActive(false);
+            updateExplosionButton(explosionButton);
+            return;
+        }
+
+        turnOffSpawn(spawnButton);
+        panel.setExplosionSpawnActive(true);
+        updateExplosionButton(explosionButton);
     }
 
     private boolean updateSpawnSides(JTextField sidesField, JButton sidesButton) {
@@ -232,12 +294,30 @@ public class Window {
         spawnButton.setBackground(SPAWN_BACKGROUND);
     }
 
+    private void updateExplosionButton(JToggleButton explosionButton) {
+        explosionButton.setText("Spawn Explosion");
+        if (explosionButton.isSelected()) {
+            explosionButton.setBackground(SPAWN_ACTIVE_BACKGROUND);
+            return;
+        }
+
+        explosionButton.setBackground(SPAWN_BACKGROUND);
+    }
+
     private void turnOffSpawn(JToggleButton spawnButton) {
         if (!spawnButton.isSelected()) return;
 
         spawnButton.setSelected(false);
         panel.stopPolygonSpawn();
         updateSpawnButton(spawnButton);
+    }
+
+    private void turnOffExplosion(JToggleButton explosionButton) {
+        if (!explosionButton.isSelected()) return;
+
+        explosionButton.setSelected(false);
+        panel.setExplosionSpawnActive(false);
+        updateExplosionButton(explosionButton);
     }
 
     private void addSettingChangeListener(

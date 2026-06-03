@@ -26,8 +26,12 @@ public class Simulation {
             obj.update(this);
         }
 
-        for (Force force : forces) {
+        for (int i = forces.size() - 1; i >= 0; i--) {
+            Force force = forces.get(i);
             force.update(this);
+            if (force.isExpired()) {
+                forces.remove(i);
+            }
         }
 
         for (int i = 0; i < Constants.collisionIterations; i++) {

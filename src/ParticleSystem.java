@@ -17,10 +17,13 @@ public class ParticleSystem {
 
     public void addParticleEffect(Color color, double lifespan, int maxParticles) {
         if (panel.wasClicked()) {
-            Util.Point effectPosition = panel.getClickPosition();
-            ParticleEffect effect = new ParticleEffect(panel, effectPosition, color, lifespan, maxParticles);
-            particleEffects.add(effect);
+            addParticleEffect(panel.getClickPosition(), color, lifespan, maxParticles);
         }
+    }
+
+    public void addParticleEffect(Util.Point effectPosition, Color color, double lifespan, int maxParticles) {
+        ParticleEffect effect = new ParticleEffect(panel, effectPosition, color, lifespan, maxParticles);
+        particleEffects.add(effect);
     }
 
     public void update(Simulation sim) {
@@ -36,6 +39,8 @@ public class ParticleSystem {
             }
             effect.updateParticles(sim);
         }
+
+        particleEffects.removeIf(ParticleEffect::isFinished);
     }
 
     public void resolveParticleCollisions(Simulation sim) {
