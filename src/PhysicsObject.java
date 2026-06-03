@@ -6,10 +6,15 @@ public class PhysicsObject implements Drawable {
     private Util.Point position;
     private double velocityX;
     private double velocityY;
+    private double angle;
+    private double angularVelocity;
+    private double momentOfInertia;
     private Drawable visual;
 
     private double mass;
     private PolygonHitbox hitbox;
+    private boolean particle;
+    private boolean staticBody;
 
     private ArrayList<Component> components = new ArrayList<>();
 
@@ -26,6 +31,7 @@ public class PhysicsObject implements Drawable {
         velocityX = 0;
         velocityY = 0;
         mass = m;
+        initMomentOfInertia();
     }
 
     /**
@@ -43,6 +49,7 @@ public class PhysicsObject implements Drawable {
         velocityX = initialVelocityX;
         velocityY = initialVelocityY;
         mass = m;
+        initMomentOfInertia();
     }
 
     /**
@@ -58,6 +65,7 @@ public class PhysicsObject implements Drawable {
         velocityX = 0;
         velocityY = 0;
         mass = m;
+        initMomentOfInertia();
     }
 
     /**
@@ -75,16 +83,46 @@ public class PhysicsObject implements Drawable {
         velocityX = initialVelocityX;
         velocityY = initialVelocityY;
         mass = m;
+        initMomentOfInertia();
+    }
+
+    private void initMomentOfInertia() {
+        if (mass <= 0) {
+            momentOfInertia = 1;
+            return;
+        }
+        double radius = hitbox.getRadius();
+        momentOfInertia = 0.5 * mass * radius * radius;
     }
 
     public void update(Simulation sim) {
         for (Component c : components) {
+            if (c instanceof Collision) continue;
             c.update(this, sim);
         }
 
-        setPosition(new Util.Point(position.x() + velocityX, position.y() + velocityY));
+        if (!isStatic()) {
+            angle += angularVelocity;
+            setPosition(new Util.Point(position.x() + velocityX, position.y() + velocityY));
+            syncTransform();
+        }
+    }
+
+    public void resolveCollisions(Simulation sim) {
+        for (Component c : components) {
+            if (c instanceof Collision) {
+                c.update(this, sim);
+            }
+        }
+    }
+
+    public void syncTransform() {
         hitbox.setPosition(position);
+        hitbox.setRotation(angle);
         visual.setPosition(position);
+        if (visual instanceof Polygon polygon) {
+            polygon.setRotation(angle);
+        }
     }
 
     public void addComponent(Component c) {
@@ -131,6 +169,51 @@ public class PhysicsObject implements Drawable {
 
     public double getVelocityX() {
         return velocityX;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+        syncTransform();
+    }
+
+    public double getAngularVelocity() {
+        return angularVelocity;
+    }
+
+    public void setAngularVelocity(double angularVelocity) {
+        this.angularVelocity = angularVelocity;
+    }
+
+    public double getMomentOfInertia() {
+        return momentOfInertia;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public boolean isStatic() {
+        return staticBody || mass == 0;
+    }
+
+    public void setStatic(boolean staticBody) {
+        this.staticBody = staticBody;
+    }
+
+    public boolean isParticle() {
+        return particle;
+    }
+
+    public void setParticle(boolean particle) {
+        this.particle = particle;
+    }
+
+    public PolygonHitbox getHitbox() {
+        return hitbox;
     }
 
     public boolean isColliding(PhysicsObject po) {

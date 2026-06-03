@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.awt.Color;
 
 public class ParticleSystem {
-    private ArrayList<ParticleEffect> particleEffects;
+    public ArrayList<ParticleEffect> particleEffects;
     private DrawingPanel panel;
     private int intensity;
     private double spawnAccumulator;
@@ -35,6 +35,12 @@ public class ParticleSystem {
                 effect.addParticle();
             }
             effect.update(sim);
+        }
+    }
+
+    public void resolveParticleCollisions(Simulation sim) {
+        for (ParticleEffect effect : particleEffects) {
+            effect.resolveCollisions(sim);
         }
 
         particleEffects.removeIf(ParticleEffect::isFinished);

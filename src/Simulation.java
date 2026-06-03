@@ -4,9 +4,11 @@ import java.util.List;
 
 public class Simulation {
     private List<PhysicsObject> objects = new ArrayList<>();
+    private List<Force> forces = new ArrayList<>();
     private double gravity = Constants.gravity;
 
     public void add(PhysicsObject obj) { objects.add(obj); }
+    public void addForce(Force force) { forces.add(force); }
     
     public void remove(PhysicsObject obj) { objects.remove(obj); }
     
@@ -18,9 +20,22 @@ public class Simulation {
 
     public double getGravityStep() { return gravity * Constants.timeStep; }
 
-    public void updatePhysicsObjects() {
+    public void update(ParticleSystem particleSystem) {
+        particleSystem.spawnAndUpdateParticles(this);
+
         for (PhysicsObject obj : objects) {
             obj.update(this);
+        }
+
+        for (Force force : forces) {
+            force.update(this);
+        }
+
+        for (int i = 0; i < Constants.collisionIterations; i++) {
+            for (PhysicsObject obj : objects) {
+                obj.resolveCollisions(this);
+            }
+            particleSystem.resolveParticleCollisions(this);
         }
     }
 }

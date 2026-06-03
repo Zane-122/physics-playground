@@ -14,7 +14,8 @@ public class App {
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
         double borderSize = Math.max(w, h);
-
+        sim.addForce(new Pull(new Util.Point(w / 2, h / 2), 2000));
+        ps.particleEffects.add(new ParticleEffect(drawingPanel, new Util.Point(w / 2, h / 2)));
         addBorderWall(sim, borderSize, new Util.Point(w / 2, -borderSize));
         addBorderWall(sim, borderSize, new Util.Point(w / 2, h + borderSize));
         addBorderWall(sim, borderSize, new Util.Point(-borderSize, h / 2));
@@ -25,7 +26,7 @@ public class App {
             ps.update(sim);
 
             sim.updatePhysicsObjects();
-
+          
             drawingPanel.repaint();
         });
 
@@ -35,8 +36,8 @@ public class App {
     private static void addBorderWall(Simulation sim, double size, Util.Point center) {
         Polygon square = new Polygon(4, size, center);
         PhysicsObject wall = new PhysicsObject(square, center, 0);
+        wall.setStatic(true);
         wall.addComponent(new Freeze());
-        wall.addComponent(new Collision());
         sim.add(wall);
     }
 }
