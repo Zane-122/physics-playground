@@ -102,6 +102,10 @@ public class PhysicsObject implements Drawable {
         }
 
         if (!isStatic()) {
+            velocityX *= 0.999;
+            velocityY *= 0.999;
+            angularVelocity *= 0.995;
+
             angle += angularVelocity;
             setPosition(new Util.Point(position.x() + velocityX, position.y() + velocityY));
             syncTransform();

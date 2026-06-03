@@ -9,30 +9,30 @@ public class Collision extends Component {
             if (object.isStatic() && other.isStatic()) continue;
 
             if (other.isStatic()) {
-                tryResolve(object, other);
+                tryResolve(object, other, sim);
                 continue;
             }
 
             if (System.identityHashCode(object) > System.identityHashCode(other)) continue;
-            tryResolve(object, other);
+            tryResolve(object, other, sim);
         }
     }
 
-    private static void tryResolve(PhysicsObject a, PhysicsObject b) {
+    private static void tryResolve(PhysicsObject a, PhysicsObject b, Simulation sim) {
         CollisionData data = a.getHitbox().getCollisionData(b.getHitbox());
         if (data == null) return;
 
         if (a.isParticle() || b.isParticle()) {
-            resolveLinear(a, b, data);
+            resolveLinear(a, b, data, sim);
         } else {
-            resolveAngular(a, b, data);
+            resolveAngular(a, b, data, sim);
         }
     }
 
-    private static void resolveLinear(PhysicsObject a, PhysicsObject b, CollisionData data) {
+    private static void resolveLinear(PhysicsObject a, PhysicsObject b, CollisionData data, Simulation sim) {
         double nx = data.normalX();
         double ny = data.normalY();
-        double depth = data.depth() + Constants.separationSlop;
+        double depth = Math.max(data.depth() - Constants.separationSlop, 0);
 
         boolean staticA = a.isStatic();
         boolean staticB = b.isStatic();
@@ -44,20 +44,23 @@ public class Collision extends Component {
             cancelInboundCenterVelocity(dynamic, nx, ny);
             double vRelN = relativeCenterVelocityN(a, b, nx, ny);
             if (vRelN < 0) {
-                applyCenterImpulse(a, b, nx, ny, staticA, staticB, vRelN);
+                double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
+            ? 0.0 
+            : Constants.restitution;
+                applyCenterImpulse(a, b, nx, ny, staticA, staticB, vRelN, restitution);
             }
             return;
         }
 
         double vRelN = relativeCenterVelocityN(a, b, nx, ny);
         if (vRelN >= 0) return;
-        applyCenterImpulse(a, b, nx, ny, false, false, vRelN);
+        applyCenterImpulse(a, b, nx, ny, false, false, vRelN, Constants.restitution);
     }
 
-    private static void resolveAngular(PhysicsObject a, PhysicsObject b, CollisionData data) {
+    private static void resolveAngular(PhysicsObject a, PhysicsObject b, CollisionData data, Simulation sim) {
         double nx = data.normalX();
         double ny = data.normalY();
-        double depth = data.depth() + Constants.separationSlop;
+        double depth = Math.max(data.depth() - Constants.separationSlop, 0);
         double cx = data.contactX();
         double cy = data.contactY();
 
@@ -70,7 +73,10 @@ public class Collision extends Component {
             PhysicsObject dynamic = staticA ? b : a;
             double vRelN = relativeContactVelocityN(a, b, nx, ny, cx, cy);
             if (vRelN < 0) {
-                applyAngularImpulse(a, b, nx, ny, staticA, staticB, cx, cy, vRelN);
+                double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
+            ? 0.0 
+            : Constants.restitution;
+                applyAngularImpulse(a, b, nx, ny, staticA, staticB, cx, cy, vRelN, restitution);
             }
             cancelInboundContactVelocity(dynamic, nx, ny, cx, cy);
             return;
@@ -78,7 +84,7 @@ public class Collision extends Component {
 
         double vRelN = relativeContactVelocityN(a, b, nx, ny, cx, cy);
         if (vRelN >= 0) return;
-        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN);
+        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN, Constants.restitution);
     }
 
     private static double relativeCenterVelocityN(PhysicsObject a, PhysicsObject b, double nx, double ny) {
@@ -106,13 +112,14 @@ public class Collision extends Component {
         double ny,
         boolean staticA,
         boolean staticB,
-        double vRelN
+        double vRelN,
+        double restitution
     ) {
         double invMassA = staticA ? 0 : 1 / a.getMass();
         double invMassB = staticB ? 0 : 1 / b.getMass();
         if (invMassA == 0 && invMassB == 0) return;
 
-        double impulse = -(1 + Constants.restitution) * vRelN / (invMassA + invMassB);
+        double impulse = -(1 + restitution) * vRelN / (invMassA + invMassB);
 
         if (!staticA) {
             a.setVelocity(
@@ -137,7 +144,8 @@ public class Collision extends Component {
         boolean staticB,
         double contactX,
         double contactY,
-        double vRelN
+        double vRelN,
+        double restitution
     ) {
         double rAx = contactX - a.getPosition().x();
         double rAy = contactY - a.getPosition().y();
@@ -157,7 +165,7 @@ public class Collision extends Component {
             + rCrossN_B * rCrossN_B * invInertiaB;
         if (denominator == 0) return;
 
-        double impulse = -(1 + Constants.restitution) * vRelN / denominator;
+        double impulse = -(1 + restitution) * vRelN / denominator;
 
         if (!staticA) {
             a.setVelocity(

@@ -1,6 +1,6 @@
 public class Constants {
     public static final int pixelsPerMeter = 1;
-    public static final double gravity = 1.62 * pixelsPerMeter;
+    public static final double gravity = 9.81 * pixelsPerMeter;
     public static final double FPS = 40;
     public static final double timeStep = 1.0 / FPS;
     public static final double gravityStep = gravity * timeStep;
@@ -11,7 +11,7 @@ public class Constants {
     public static final double particleLifespan = 20;
 
     /** 0 = no bounce, 1 = perfectly elastic */
-    public static final double restitution = 0.35;
+    public static final double restitution = 0.1;
 
     public static final double separationSlop = 2.0;
     public static final int collisionIterations = 3;
