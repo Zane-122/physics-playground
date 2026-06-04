@@ -158,6 +158,20 @@ public class Window {
             sizeLabel.setText("Size Set: " + size);
         });
 
+        JLabel bounceLabel = createToolbarLabel("Bounciness: 0.1");
+        bounceLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
+        JSlider bounceSlider = new JSlider(0, 100, 10);
+        bounceSlider.setPreferredSize(new Dimension(150, 32));
+        bounceSlider.setMaximumSize(new Dimension(150, 32));
+        bounceSlider.setOpaque(false);
+        bounceSlider.setFocusable(false);
+        bounceSlider.setToolTipText("Bounciness");
+        bounceSlider.addChangeListener(e -> {
+            int bounciness = bounceSlider.getValue();
+            panel.getSimulation().setBounciness(bounciness / 100.0);
+            bounceLabel.setText("Bounciness: " + String.format("%.1f", bounciness / 100.0));
+        });
+
         JLabel explosionLabel = createToolbarLabel("Push 2000");
         JSlider explosionSlider = new JSlider(500, 8000, 2000);
         explosionSlider.setPreferredSize(new Dimension(150, 32));
@@ -185,6 +199,10 @@ public class Window {
         settingsToolbar.add(sizeLabel);
         settingsToolbar.add(Box.createHorizontalStrut(6));
         settingsToolbar.add(sizeSlider);
+        settingsToolbar.add(Box.createHorizontalStrut(16));
+        settingsToolbar.add(bounceLabel);
+        settingsToolbar.add(Box.createHorizontalStrut(6));
+        settingsToolbar.add(bounceSlider);
 
         spawnToolbar.add(spawnButton);
         spawnToolbar.add(Box.createHorizontalStrut(16));

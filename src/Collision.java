@@ -46,7 +46,7 @@ public class Collision extends Component {
             if (vRelN < 0) {
                 double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
             ? 0.0 
-            : Constants.restitution;
+            : sim.getBounciness();
                 applyCenterImpulse(a, b, nx, ny, staticA, staticB, vRelN, restitution);
             }
             return;
@@ -54,7 +54,7 @@ public class Collision extends Component {
 
         double vRelN = relativeCenterVelocityN(a, b, nx, ny);
         if (vRelN >= 0) return;
-        applyCenterImpulse(a, b, nx, ny, false, false, vRelN, Constants.restitution);
+        applyCenterImpulse(a, b, nx, ny, false, false, vRelN, sim.getBounciness());
     }
 
     private static void resolveAngular(PhysicsObject a, PhysicsObject b, CollisionData data, Simulation sim) {
@@ -75,7 +75,7 @@ public class Collision extends Component {
             if (vRelN < 0) {
                 double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
             ? 0.0 
-            : Constants.restitution;
+            : sim.getBounciness();
                 applyAngularImpulse(a, b, nx, ny, staticA, staticB, cx, cy, vRelN, restitution);
             }
             cancelInboundContactVelocity(dynamic, nx, ny, cx, cy);
@@ -84,7 +84,7 @@ public class Collision extends Component {
 
         double vRelN = relativeContactVelocityN(a, b, nx, ny, cx, cy);
         if (vRelN >= 0) return;
-        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN, Constants.restitution);
+        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN, sim.getBounciness());
     }
 
     private static double relativeCenterVelocityN(PhysicsObject a, PhysicsObject b, double nx, double ny) {

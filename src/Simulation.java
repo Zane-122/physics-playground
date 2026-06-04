@@ -6,6 +6,7 @@ public class Simulation {
     private List<PhysicsObject> objects = new ArrayList<>();
     private List<Force> forces = new ArrayList<>();
     private double gravity = Constants.gravity;
+    private double restitution = Constants.restitution;
 
     public void add(PhysicsObject obj) { objects.add(obj); }
     public void addForce(Force force) { forces.add(force); }
@@ -17,6 +18,10 @@ public class Simulation {
     public double getGravity() { return gravity; }
 
     public void setGravity(double gravity) { this.gravity = gravity; }
+
+    public void setBounciness(double restitution) { this.restitution = restitution; }
+
+    public double getBounciness() { return restitution; }
 
     public double getGravityStep() { return gravity * Constants.timeStep; }
 
