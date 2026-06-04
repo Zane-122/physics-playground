@@ -26,6 +26,11 @@ public class ParticleSystem {
         particleEffects.add(effect);
     }
 
+    public void addParticleEffect(Util.Point effectPosition, Color color, double lifespan, int maxParticles, double direction) {
+        ParticleEffect effect = new ParticleEffect(panel, effectPosition, color, lifespan, maxParticles, direction);
+        particleEffects.add(effect);
+    }
+
     public void update(Simulation sim) {
         spawnAccumulator += (double) intensity / FPS;
         int particlesToSpawn = (int) spawnAccumulator;

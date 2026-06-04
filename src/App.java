@@ -32,7 +32,7 @@ public class App {
                     explosionPosition,
                     drawingPanel.getExplosionStrength()
                 ));
-                ps.addParticleEffect(explosionPosition, Color.red, Constants.particleLifespan, explosionParticleCount);
+                ps.addParticleEffect(explosionPosition, Color.red, Constants.particleLifespan, explosionParticleCount, -90);
             }
 
             updateMouseForce(sim, drawingPanel, mouseForce);

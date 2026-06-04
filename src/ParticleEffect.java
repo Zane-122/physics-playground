@@ -9,6 +9,8 @@ public class ParticleEffect {
     private ArrayList<PhysicsObject> particles;
     private int maxParticles = -1;
     private int particleCount;
+    private boolean directed;
+    private double direction;
 
     public ParticleEffect(DrawingPanel panel, Util.Point origin) {
         this.panel = panel;
@@ -33,6 +35,17 @@ public class ParticleEffect {
         this.particles = new ArrayList<>();
     }
 
+    public ParticleEffect(DrawingPanel panel, Util.Point origin, Color color, double lifespan, int maxParticles, double direction) {
+        this.panel = panel;
+        this.origin = origin;
+        this.lifespan = lifespan;
+        this.color = color;
+        this.maxParticles = maxParticles;
+        directed = true;
+        this.direction = direction;
+        this.particles = new ArrayList<>();
+    }
+
     public void addParticle() {
         if (maxParticles >= 0 && particleCount >= maxParticles) {
             return;
@@ -42,16 +55,29 @@ public class ParticleEffect {
 
         Particle p = new Particle(spawnpoint, color, lifespan);
 
-        double angle = -Math.toRadians(Math.random() * 360);
-        double velocity = Math.random() * 11 + 6;
+        double vx;
+        double vy;
 
-        double vx = Math.cos(angle) * velocity ;
-        double vy = Math.sin(angle) * velocity;
+        if (!directed) {
+            double angle = -Math.toRadians(Math.random() * 360);
+            double velocity = Math.random() * 11 + 6;
+
+            vx = Math.cos(angle) * velocity;
+            vy = Math.sin(angle) * velocity;
+        } else {
+            double angle = -Math.toRadians((Math.random() * 60 - 30) + direction);
+            double velocity = Math.random() * 11 + 6;
+
+            vx = Math.cos(angle) * velocity;
+            vy = Math.sin(angle) * velocity;
+        }
+
         PolygonHitbox hitbox = new PolygonHitbox(new Polygon(5, 8, spawnpoint));
         PhysicsObject po = new PhysicsObject(p, hitbox, spawnpoint, 1.0, vx, vy);
         po.setParticle(true);
         po.addComponent(new Gravity());
-        po.addComponent(new Collision());
+        if (!directed) { po.addComponent(new Collision()); }
+
 
         particles.add(po);
         panel.addObject(po);
