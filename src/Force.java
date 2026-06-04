@@ -26,5 +26,13 @@ public abstract class Force {
         return age >= lifetime;
     }
 
+    public void setPosition(Util.Point position) {
+        this.position = position;
+    }
+
+    public Util.Point getPosition() {
+        return position;
+    }
+
     public abstract void apply(PhysicsObject object);
 }

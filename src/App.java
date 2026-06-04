@@ -23,6 +23,8 @@ public class App {
         addBorderWall(sim, 80, new Util.Point(300,300), 3);
         addBorderWall(sim, 100, new Util.Point(1100,500), 5);
 
+        Force[] mouseForce = { null };
+
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
             Util.Point explosionPosition = drawingPanel.consumeExplosionSpawnPosition();
             if (explosionPosition != null) {
@@ -33,6 +35,8 @@ public class App {
                 ps.addParticleEffect(explosionPosition, Color.red, Constants.particleLifespan, explosionParticleCount);
             }
 
+            updateMouseForce(sim, drawingPanel, mouseForce);
+
             ps.update(sim);
             sim.update();
 
@@ -42,6 +46,40 @@ public class App {
         });
 
         timer.start();
+    }
+
+    private static void updateMouseForce(Simulation sim, DrawingPanel panel, Force[] holder) {
+        DrawingPanel.MouseForceMode mode = panel.getMouseForceMode();
+        boolean active = mode != DrawingPanel.MouseForceMode.NONE
+            && panel.isMouseHeld()
+            && panel.getMousePos() != null;
+
+        if (!active) {
+            if (holder[0] != null) {
+                sim.removeForce(holder[0]);
+                holder[0] = null;
+            }
+            return;
+        }
+
+        Util.Point position = panel.getMousePos();
+        double strength = panel.getMouseForceStrength();
+        boolean matchesMode = (mode == DrawingPanel.MouseForceMode.PUSH && holder[0] instanceof Push)
+            || (mode == DrawingPanel.MouseForceMode.PULL && holder[0] instanceof Pull);
+
+        if (!matchesMode) {
+            if (holder[0] != null) {
+                sim.removeForce(holder[0]);
+            }
+            holder[0] = mode == DrawingPanel.MouseForceMode.PUSH
+                ? new Push(position, strength)
+                : new Pull(position, strength);
+            sim.addForce(holder[0]);
+            return;
+        }
+
+        holder[0].strength = strength;
+        holder[0].setPosition(position);
     }
 
     private static void addBorderWall(Simulation sim, double size, Util.Point center, int sides) {

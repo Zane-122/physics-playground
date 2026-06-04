@@ -90,6 +90,7 @@ public class Window {
 
         JToolBar settingsToolbar = createToolbarRow();
         JToolBar spawnToolbar = createToolbarRow();
+        JToolBar forceToolbar = createToolbarRow();
 
         JToggleButton spawnButton = new JToggleButton("Spawn Objects");
         styleButton(spawnButton, SPAWN_BACKGROUND);
@@ -98,6 +99,14 @@ public class Window {
         JToggleButton explosionButton = new JToggleButton("Spawn Explosion");
         styleButton(explosionButton, SPAWN_BACKGROUND);
         explosionButton.setToolTipText("Toggle explosion spawning on or off");
+
+        JToggleButton pushButton = new JToggleButton("Push Force");
+        styleButton(pushButton, SPAWN_BACKGROUND);
+        pushButton.setToolTipText("Hold the mouse to push objects away from the cursor");
+
+        JToggleButton pullButton = new JToggleButton("Pull Force");
+        styleButton(pullButton, SPAWN_BACKGROUND);
+        pullButton.setToolTipText("Hold the mouse to pull objects toward the cursor");
 
         JTextField gravityField = createNumberField(Double.toString(panel.getSimulation().getGravity()), 72);
         gravityField.setToolTipText("Gravity value");
@@ -141,7 +150,7 @@ public class Window {
             () -> updateSettingButton(sidesButton, "Sides Set", "Set Sides", false)
         );
 
-        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton, explosionButton));
+        spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton, explosionButton, pushButton, pullButton));
 
         JLabel sizeLabel = createToolbarLabel("Size Set: 30");
         sizeLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
@@ -186,7 +195,27 @@ public class Window {
             explosionLabel.setText("Push " + strength);
         });
 
-        explosionButton.addActionListener(e -> handleExplosionToggle(explosionButton, spawnButton));
+        explosionButton.addActionListener(e -> handleExplosionToggle(explosionButton, spawnButton, pushButton, pullButton));
+
+        JLabel forceLabel = createToolbarLabel("Force " + (int) panel.getMouseForceStrength());
+        JSlider forceSlider = new JSlider(500, 20000, (int) panel.getMouseForceStrength());
+        forceSlider.setPreferredSize(new Dimension(150, 32));
+        forceSlider.setMaximumSize(new Dimension(150, 32));
+        forceSlider.setOpaque(false);
+        forceSlider.setFocusable(false);
+        forceSlider.setToolTipText("Push/Pull force strength");
+        forceSlider.addChangeListener(e -> {
+            int strength = forceSlider.getValue();
+            panel.setMouseForceStrength(strength);
+            forceLabel.setText("Force " + strength);
+        });
+
+        pushButton.addActionListener(e -> handleForceToggle(
+            pushButton, DrawingPanel.MouseForceMode.PUSH, "Push Force", "Pushing (hold)",
+            spawnButton, explosionButton, pullButton));
+        pullButton.addActionListener(e -> handleForceToggle(
+            pullButton, DrawingPanel.MouseForceMode.PULL, "Pull Force", "Pulling (hold)",
+            spawnButton, explosionButton, pushButton));
 
         settingsToolbar.add(gravityButton);
         settingsToolbar.add(Box.createHorizontalStrut(6));
@@ -212,8 +241,17 @@ public class Window {
         spawnToolbar.add(Box.createHorizontalStrut(6));
         spawnToolbar.add(explosionSlider);
 
+        forceToolbar.add(pushButton);
+        forceToolbar.add(Box.createHorizontalStrut(6));
+        forceToolbar.add(pullButton);
+        forceToolbar.add(Box.createHorizontalStrut(16));
+        forceToolbar.add(forceLabel);
+        forceToolbar.add(Box.createHorizontalStrut(6));
+        forceToolbar.add(forceSlider);
+
         toolbarPanel.add(settingsToolbar);
         toolbarPanel.add(spawnToolbar);
+        toolbarPanel.add(forceToolbar);
 
         return toolbarPanel;
     }
@@ -249,7 +287,9 @@ public class Window {
         JToggleButton spawnButton,
         JTextField sidesField,
         JButton sidesButton,
-        JToggleButton explosionButton
+        JToggleButton explosionButton,
+        JToggleButton pushButton,
+        JToggleButton pullButton
     ) {
         if (!spawnButton.isSelected()) {
             panel.stopPolygonSpawn();
@@ -258,6 +298,8 @@ public class Window {
         }
 
         turnOffExplosion(explosionButton);
+        turnOffForce(pushButton);
+        turnOffForce(pullButton);
 
         if (!updateSpawnSides(sidesField, sidesButton)) {
             spawnButton.setSelected(false);
@@ -269,7 +311,12 @@ public class Window {
         updateSpawnButton(spawnButton);
     }
 
-    private void handleExplosionToggle(JToggleButton explosionButton, JToggleButton spawnButton) {
+    private void handleExplosionToggle(
+        JToggleButton explosionButton,
+        JToggleButton spawnButton,
+        JToggleButton pushButton,
+        JToggleButton pullButton
+    ) {
         if (!explosionButton.isSelected()) {
             panel.setExplosionSpawnActive(false);
             updateExplosionButton(explosionButton);
@@ -277,8 +324,56 @@ public class Window {
         }
 
         turnOffSpawn(spawnButton);
+        turnOffForce(pushButton);
+        turnOffForce(pullButton);
         panel.setExplosionSpawnActive(true);
         updateExplosionButton(explosionButton);
+    }
+
+    private void handleForceToggle(
+        JToggleButton forceButton,
+        DrawingPanel.MouseForceMode mode,
+        String idleText,
+        String activeText,
+        JToggleButton spawnButton,
+        JToggleButton explosionButton,
+        JToggleButton otherForceButton
+    ) {
+        if (!forceButton.isSelected()) {
+            panel.setMouseForceMode(DrawingPanel.MouseForceMode.NONE);
+            updateForceButton(forceButton, idleText, activeText);
+            return;
+        }
+
+        turnOffSpawn(spawnButton);
+        turnOffExplosion(explosionButton);
+        turnOffForce(otherForceButton);
+        panel.setMouseForceMode(mode);
+        updateForceButton(forceButton, idleText, activeText);
+    }
+
+    private void updateForceButton(JToggleButton forceButton, String idleText, String activeText) {
+        if (forceButton.isSelected()) {
+            forceButton.setText(activeText);
+            forceButton.setBackground(SPAWN_ACTIVE_BACKGROUND);
+            return;
+        }
+
+        forceButton.setText(idleText);
+        forceButton.setBackground(SPAWN_BACKGROUND);
+    }
+
+    private void turnOffForce(JToggleButton forceButton) {
+        if (!forceButton.isSelected()) return;
+
+        forceButton.setSelected(false);
+        panel.setMouseForceMode(DrawingPanel.MouseForceMode.NONE);
+        forceButton.setBackground(SPAWN_BACKGROUND);
+        if (forceButton.getText().startsWith("Pulling")) {
+            forceButton.setText("Pull Force");
+        } else if (forceButton.getText().startsWith("Pushing")) {
+            forceButton.setText("Push Force");
+        }
     }
 
     private boolean updateSpawnSides(JTextField sidesField, JButton sidesButton) {

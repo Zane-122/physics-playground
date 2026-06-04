@@ -11,6 +11,7 @@ public class Simulation {
 
     public void add(PhysicsObject obj) { objects.add(obj); }
     public void addForce(Force force) { forces.add(force); }
+    public void removeForce(Force force) { forces.remove(force); }
     
     public void remove(PhysicsObject obj) { objects.remove(obj); }
     

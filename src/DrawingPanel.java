@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class DrawingPanel extends JPanel {
+    public enum MouseForceMode { NONE, PUSH, PULL }
+
     private ArrayList<Drawable> drawables = new ArrayList<>();
     private Util.Point mousePosition = null;
     private boolean mouseHeld = false;
@@ -16,6 +18,8 @@ public class DrawingPanel extends JPanel {
     private boolean explosionSpawnActive =false;
     private double explosionStrength = 2000;
     private Util.Point pendingExplosionPosition = null;
+    private MouseForceMode mouseForceMode = MouseForceMode.NONE;
+    private double mouseForceStrength = 4000;
     private static final int defaultPolygonSides = 5;
     private static final double defaultPolygonRadius = 30;
     private static final double minimumSpawnedPolygonMass = 0.25;
@@ -99,6 +103,7 @@ public class DrawingPanel extends JPanel {
         spawnPolygonSides = sides;
         polygonSpawnActive = true;
         explosionSpawnActive = false;
+        mouseForceMode = MouseForceMode.NONE;
         setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
 
@@ -123,13 +128,40 @@ public class DrawingPanel extends JPanel {
         explosionSpawnActive = active;
         if (active) {
             polygonSpawnActive = false;
+            mouseForceMode = MouseForceMode.NONE;
             setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             return;
         }
 
-        if (!polygonSpawnActive) {
+        if (!polygonSpawnActive && mouseForceMode == MouseForceMode.NONE) {
             setCursor(Cursor.getDefaultCursor());
         }
+    }
+
+    public void setMouseForceMode(MouseForceMode mode) {
+        mouseForceMode = mode == null ? MouseForceMode.NONE : mode;
+        if (mouseForceMode != MouseForceMode.NONE) {
+            polygonSpawnActive = false;
+            explosionSpawnActive = false;
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            return;
+        }
+
+        if (!polygonSpawnActive && !explosionSpawnActive) {
+            setCursor(Cursor.getDefaultCursor());
+        }
+    }
+
+    public MouseForceMode getMouseForceMode() {
+        return mouseForceMode;
+    }
+
+    public void setMouseForceStrength(double strength) {
+        mouseForceStrength = strength;
+    }
+
+    public double getMouseForceStrength() {
+        return mouseForceStrength;
     }
 
     public void setExplosionStrength(double strength) {
