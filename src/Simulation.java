@@ -7,6 +7,7 @@ public class Simulation {
     private List<Force> forces = new ArrayList<>();
     private double gravity = Constants.gravity;
     private double restitution = Constants.restitution;
+    private double friction = Constants.contactFrictionRetention;
 
     public void add(PhysicsObject obj) { objects.add(obj); }
     public void addForce(Force force) { forces.add(force); }
@@ -22,6 +23,10 @@ public class Simulation {
     public void setBounciness(double restitution) { this.restitution = restitution; }
 
     public double getBounciness() { return restitution; }
+
+    public void setFriction(double friction) { this.friction = friction; }
+
+    public double getFriction() { return friction; }
 
     public double getGravityStep() { return gravity * Constants.timeStep; }
 

@@ -49,6 +49,7 @@ public class Collision extends Component {
             : sim.getBounciness();
                 applyCenterImpulse(a, b, nx, ny, staticA, staticB, vRelN, restitution);
             }
+            applyStaticContactFriction(dynamic, nx, ny, sim);
             return;
         }
 
@@ -79,6 +80,7 @@ public class Collision extends Component {
                 applyAngularImpulse(a, b, nx, ny, staticA, staticB, cx, cy, vRelN, restitution);
             }
             cancelInboundContactVelocity(dynamic, nx, ny, cx, cy);
+            applyStaticContactFriction(dynamic, nx, ny, sim);
             return;
         }
 
@@ -172,14 +174,17 @@ public class Collision extends Component {
                 a.getVelocityX() + impulse * nx * invMassA,
                 a.getVelocityY() + impulse * ny * invMassA
             );
-            a.setAngularVelocity(a.getAngularVelocity() + impulse * rCrossN_A * invInertiaA);
+
+            double newAngularVelocity = a.getAngularVelocity() + impulse * rCrossN_A * invInertiaA;
+            a.setAngularVelocity(newAngularVelocity * 0.97);
         }
         if (!staticB) {
             b.setVelocity(
                 b.getVelocityX() - impulse * nx * invMassB,
                 b.getVelocityY() - impulse * ny * invMassB
             );
-            b.setAngularVelocity(b.getAngularVelocity() - impulse * rCrossN_B * invInertiaB);
+            double newAngularVelocity = b.getAngularVelocity() - impulse * rCrossN_B * invInertiaB;
+            b.setAngularVelocity(newAngularVelocity * 0.97);
         }
     }
 
@@ -214,6 +219,24 @@ public class Collision extends Component {
             body.getVelocityY() + impulse * ny * invMass
         );
         body.setAngularVelocity(body.getAngularVelocity() + impulse * rCrossN * invInertia);
+    }
+
+    private static void applyStaticContactFriction(PhysicsObject dynamic, double nx, double ny, Simulation sim) {
+        double tx = -ny;
+        double ty = nx;
+        double tangentialVelocity = dynamic.getVelocityX() * tx + dynamic.getVelocityY() * ty;
+        double retention = sim.getFriction();
+        double reducedTangent = tangentialVelocity * retention;
+        double delta = tangentialVelocity - reducedTangent;
+
+        if (Math.abs(delta) < 1e-5) {
+            return;
+        }
+
+        dynamic.setVelocity(
+            dynamic.getVelocityX() - delta * tx,
+            dynamic.getVelocityY() - delta * ty
+        );
     }
 
     private static void separate(
