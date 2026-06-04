@@ -143,9 +143,9 @@ public class Window {
 
         spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton, explosionButton));
 
-        JLabel sizeLabel = createToolbarLabel("Size Set: 40");
+        JLabel sizeLabel = createToolbarLabel("Size Set: 30");
         sizeLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
-        JSlider sizeSlider = new JSlider(10, 100, 40);
+        JSlider sizeSlider = new JSlider(10, 100, 30);
         sizeSlider.setPreferredSize(new Dimension(150, 32));
         sizeSlider.setMaximumSize(new Dimension(150, 32));
         sizeSlider.setOpaque(false);
@@ -156,6 +156,20 @@ public class Window {
             turnOffSpawn(spawnButton);
             panel.setSpawnedPolygonRadius(size);
             sizeLabel.setText("Size Set: " + size);
+        });
+
+        JLabel bounceLabel = createToolbarLabel("Bounciness: 0.5");
+        bounceLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
+        JSlider bounceSlider = new JSlider(0, 100, 50);
+        bounceSlider.setPreferredSize(new Dimension(150, 32));
+        bounceSlider.setMaximumSize(new Dimension(150, 32));
+        bounceSlider.setOpaque(false);
+        bounceSlider.setFocusable(false);
+        bounceSlider.setToolTipText("Bounciness");
+        bounceSlider.addChangeListener(e -> {
+            int bounciness = bounceSlider.getValue();
+            panel.getSimulation().setBounciness(bounciness / 100.0);
+            bounceLabel.setText("Bounciness: " + String.format("%.1f", bounciness / 100.0));
         });
 
         JLabel explosionLabel = createToolbarLabel("Push 2000");
@@ -185,6 +199,10 @@ public class Window {
         settingsToolbar.add(sizeLabel);
         settingsToolbar.add(Box.createHorizontalStrut(6));
         settingsToolbar.add(sizeSlider);
+        settingsToolbar.add(Box.createHorizontalStrut(16));
+        settingsToolbar.add(bounceLabel);
+        settingsToolbar.add(Box.createHorizontalStrut(6));
+        settingsToolbar.add(bounceSlider);
 
         spawnToolbar.add(spawnButton);
         spawnToolbar.add(Box.createHorizontalStrut(16));

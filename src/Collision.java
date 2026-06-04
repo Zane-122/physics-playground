@@ -46,15 +46,16 @@ public class Collision extends Component {
             if (vRelN < 0) {
                 double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
             ? 0.0 
-            : Constants.restitution;
+            : sim.getBounciness();
                 applyCenterImpulse(a, b, nx, ny, staticA, staticB, vRelN, restitution);
             }
+            applyStaticContactFriction(dynamic, nx, ny, sim);
             return;
         }
 
         double vRelN = relativeCenterVelocityN(a, b, nx, ny);
         if (vRelN >= 0) return;
-        applyCenterImpulse(a, b, nx, ny, false, false, vRelN, Constants.restitution);
+        applyCenterImpulse(a, b, nx, ny, false, false, vRelN, sim.getBounciness());
     }
 
     private static void resolveAngular(PhysicsObject a, PhysicsObject b, CollisionData data, Simulation sim) {
@@ -75,16 +76,17 @@ public class Collision extends Component {
             if (vRelN < 0) {
                 double restitution = Math.abs(vRelN) < 2.0 * sim.getGravityStep() 
             ? 0.0 
-            : Constants.restitution;
+            : sim.getBounciness();
                 applyAngularImpulse(a, b, nx, ny, staticA, staticB, cx, cy, vRelN, restitution);
             }
             cancelInboundContactVelocity(dynamic, nx, ny, cx, cy);
+            applyStaticContactFriction(dynamic, nx, ny, sim);
             return;
         }
 
         double vRelN = relativeContactVelocityN(a, b, nx, ny, cx, cy);
         if (vRelN >= 0) return;
-        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN, Constants.restitution);
+        applyAngularImpulse(a, b, nx, ny, false, false, cx, cy, vRelN, sim.getBounciness());
     }
 
     private static double relativeCenterVelocityN(PhysicsObject a, PhysicsObject b, double nx, double ny) {
@@ -172,14 +174,17 @@ public class Collision extends Component {
                 a.getVelocityX() + impulse * nx * invMassA,
                 a.getVelocityY() + impulse * ny * invMassA
             );
-            a.setAngularVelocity(a.getAngularVelocity() + impulse * rCrossN_A * invInertiaA);
+
+            double newAngularVelocity = a.getAngularVelocity() + impulse * rCrossN_A * invInertiaA;
+            a.setAngularVelocity(newAngularVelocity * 0.97);
         }
         if (!staticB) {
             b.setVelocity(
                 b.getVelocityX() - impulse * nx * invMassB,
                 b.getVelocityY() - impulse * ny * invMassB
             );
-            b.setAngularVelocity(b.getAngularVelocity() - impulse * rCrossN_B * invInertiaB);
+            double newAngularVelocity = b.getAngularVelocity() - impulse * rCrossN_B * invInertiaB;
+            b.setAngularVelocity(newAngularVelocity * 0.97);
         }
     }
 
@@ -214,6 +219,24 @@ public class Collision extends Component {
             body.getVelocityY() + impulse * ny * invMass
         );
         body.setAngularVelocity(body.getAngularVelocity() + impulse * rCrossN * invInertia);
+    }
+
+    private static void applyStaticContactFriction(PhysicsObject dynamic, double nx, double ny, Simulation sim) {
+        double tx = -ny;
+        double ty = nx;
+        double tangentialVelocity = dynamic.getVelocityX() * tx + dynamic.getVelocityY() * ty;
+        double retention = sim.getFriction();
+        double reducedTangent = tangentialVelocity * retention;
+        double delta = tangentialVelocity - reducedTangent;
+
+        if (Math.abs(delta) < 1e-5) {
+            return;
+        }
+
+        dynamic.setVelocity(
+            dynamic.getVelocityX() - delta * tx,
+            dynamic.getVelocityY() - delta * ty
+        );
     }
 
     private static void separate(
