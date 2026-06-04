@@ -32,8 +32,10 @@ public class Particle implements Drawable {
 
     @Override
     public void draw(Graphics g) {
+        Color oldColor = g.getColor();
         g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha()));
         g.fillOval((int) position.x() - 5, (int) position.y(), 8, 8);
+        g.setColor(oldColor);
     }
 
     @Override

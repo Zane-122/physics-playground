@@ -14,12 +14,8 @@ public class App {
         ParticleSystem ps = new ParticleSystem(drawingPanel, new Util.Point(Constants.windowWidth / 2, Constants.windowHeight / 2), 1000);
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
-        double borderSize = Math.max(w, h);
 
-        addBorderWall(sim, borderSize, new Util.Point(w / 2, -borderSize));
-        addBorderWall(sim, borderSize, new Util.Point(w / 2, h + borderSize));
-        addBorderWall(sim, borderSize, new Util.Point(-borderSize, h / 2));
-        addBorderWall(sim, borderSize, new Util.Point(w + borderSize, h / 2));
+        addBorderWall(sim, w * 2, new Util.Point(w / 2, h + 1200));
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
             Util.Point explosionPosition = drawingPanel.consumeExplosionSpawnPosition();
@@ -41,8 +37,9 @@ public class App {
     }
 
     private static void addBorderWall(Simulation sim, double size, Util.Point center) {
-        Polygon square = new Polygon(4, size, center);
-        PhysicsObject wall = new PhysicsObject(square, center, 0);
+        Polygon square = new Polygon(4, size, center, 0);
+        PhysicsObject wall = new PhysicsObject(square, center, 0, Color.RED);
+        wall.setRotation(Math.PI/4);
         wall.setStatic(true);
         wall.addComponent(new Freeze());
         sim.add(wall);

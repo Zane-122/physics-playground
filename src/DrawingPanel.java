@@ -148,7 +148,7 @@ public class DrawingPanel extends JPanel {
 
     private void spawnPolygon(Util.Point position) {
         Polygon polygon = new Polygon(spawnPolygonSides, spawnedPolygonRadius, position);
-        PhysicsObject object = new PhysicsObject(polygon, position, calculateSpawnedPolygonMass());
+        PhysicsObject object = new PhysicsObject(polygon, position, calculateSpawnedPolygonMass(), Color.CYAN);
         object.addComponent(new Gravity());
         object.addComponent(new Collision());
         sim.add(object);
@@ -169,12 +169,33 @@ public class DrawingPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Graphics2D g2d = (Graphics2D) g;
+        Stroke oldStroke = g2d.getStroke();
+        Composite oldComposite = g2d.getComposite();
+        Color oldColor = g2d.getColor();
+
+        // Glow pass: render a faint wide outline using each object's own color.
+        g2d.setStroke(new BasicStroke(10));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
         for (Drawable d : drawables) {
-            d.draw(g);
+            d.draw(g2d);
+        }
+        for (PhysicsObject o : sim.getObjects()) {
+            o.draw(g2d);
         }
 
-        for (PhysicsObject o : sim.getObjects()) {
-            o.draw(g);
+        // Main pass: draw objects normally on top.
+        g2d.setStroke(new BasicStroke(3));
+        g2d.setComposite(oldComposite);
+        g2d.setColor(oldColor);
+        for (Drawable d : drawables) {
+            d.draw(g2d);
         }
+        for (PhysicsObject o : sim.getObjects()) {
+            o.draw(g2d);
+        }
+
+        g2d.setStroke(oldStroke);
+        g2d.setColor(oldColor);
     }
 }

@@ -24,7 +24,7 @@ import javax.swing.event.DocumentListener;
 
 public class Window {
     private static final Color TOOLBAR_BACKGROUND = Color.WHITE;
-    private static final Color PANEL_BACKGROUND = new Color(245, 247, 250);
+    private static final Color PANEL_BACKGROUND = new Color(0x1c1c1c);
     private static final Color BUTTON_BACKGROUND = new Color(72, 105, 178);
     private static final Color SPAWN_BACKGROUND = new Color(117, 83, 160);
     private static final Color SPAWN_ACTIVE_BACKGROUND = new Color(45, 139, 99);
