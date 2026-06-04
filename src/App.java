@@ -35,6 +35,8 @@ public class App {
 
             ps.update(sim);
             sim.update();
+
+            ps.resolveParticleCollisions(sim);
           
             drawingPanel.repaint();
         });
