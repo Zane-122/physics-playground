@@ -143,9 +143,9 @@ public class Window {
 
         spawnButton.addActionListener(e -> handleSpawnToggle(spawnButton, sidesField, sidesButton, explosionButton));
 
-        JLabel sizeLabel = createToolbarLabel("Size Set: 40");
+        JLabel sizeLabel = createToolbarLabel("Size Set: 30");
         sizeLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
-        JSlider sizeSlider = new JSlider(10, 100, 40);
+        JSlider sizeSlider = new JSlider(10, 100, 30);
         sizeSlider.setPreferredSize(new Dimension(150, 32));
         sizeSlider.setMaximumSize(new Dimension(150, 32));
         sizeSlider.setOpaque(false);
@@ -158,9 +158,9 @@ public class Window {
             sizeLabel.setText("Size Set: " + size);
         });
 
-        JLabel bounceLabel = createToolbarLabel("Bounciness: 0.1");
+        JLabel bounceLabel = createToolbarLabel("Bounciness: 0.5");
         bounceLabel.setForeground(SPAWN_ACTIVE_BACKGROUND);
-        JSlider bounceSlider = new JSlider(0, 100, 10);
+        JSlider bounceSlider = new JSlider(0, 100, 50);
         bounceSlider.setPreferredSize(new Dimension(150, 32));
         bounceSlider.setMaximumSize(new Dimension(150, 32));
         bounceSlider.setOpaque(false);

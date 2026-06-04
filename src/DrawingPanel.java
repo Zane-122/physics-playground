@@ -12,12 +12,12 @@ public class DrawingPanel extends JPanel {
     private Simulation sim;
     private int spawnPolygonSides = 5;
     private boolean polygonSpawnActive = false;
-    private double spawnedPolygonRadius = 40;
-    private boolean explosionSpawnActive = false;
+    private double spawnedPolygonRadius = 30;
+    private boolean explosionSpawnActive =false;
     private double explosionStrength = 2000;
     private Util.Point pendingExplosionPosition = null;
     private static final int defaultPolygonSides = 5;
-    private static final double defaultPolygonRadius = 40;
+    private static final double defaultPolygonRadius = 30;
     private static final double minimumSpawnedPolygonMass = 0.25;
 
     public DrawingPanel(Simulation sim) {

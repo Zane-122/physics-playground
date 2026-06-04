@@ -11,10 +11,10 @@ public class Constants {
     public static final double particleLifespan = 20;
 
     /** 0 = no bounce, 1 = perfectly elastic */
-    public static final double restitution = 0.1;
+    public static final double restitution = 0.5;
 
     /** Contact friction retention applied on static contact tangential velocity. */
-    public static final double contactFrictionRetention = 0.95;
+    public static final double contactFrictionRetention = 0.99;
 
     public static final double separationSlop = 2.0;
     public static final int collisionIterations = 3;

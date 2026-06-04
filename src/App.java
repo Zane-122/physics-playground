@@ -15,7 +15,13 @@ public class App {
         double w = Constants.windowWidth;
         double h = Constants.windowHeight;
 
-        addBorderWall(sim, w * 2, new Util.Point(w / 2, h + 1200));
+        addBorderWall(sim, w * 2, new Util.Point(w / 2, h + 1300), 4);
+        addBorderWall(sim, w * 2, new Util.Point(w / 2, h - 1700), 4);
+        addBorderWall(sim, h * 2, new Util.Point(w + 1500, h / 2), 4);
+        addBorderWall(sim, h * 2, new Util.Point(w - 1625, h / 2), 4);
+
+        addBorderWall(sim, 80, new Util.Point(300,300), 3);
+        addBorderWall(sim, 100, new Util.Point(1100,500), 5);
 
         Timer timer = new Timer((int)(1000 / Constants.FPS), e -> {
             Util.Point explosionPosition = drawingPanel.consumeExplosionSpawnPosition();
@@ -36,8 +42,8 @@ public class App {
         timer.start();
     }
 
-    private static void addBorderWall(Simulation sim, double size, Util.Point center) {
-        Polygon square = new Polygon(4, size, center, 0);
+    private static void addBorderWall(Simulation sim, double size, Util.Point center, int sides) {
+        Polygon square = new Polygon(sides, size, center, 0);
         PhysicsObject wall = new PhysicsObject(square, center, 0, Color.RED);
         wall.setRotation(Math.PI/4);
         wall.setStatic(true);
