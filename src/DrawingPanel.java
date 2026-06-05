@@ -227,7 +227,48 @@ public class DrawingPanel extends JPanel {
             o.draw(g2d);
         }
 
+        drawMouseForceOverlay(g2d);
+
         g2d.setStroke(oldStroke);
+        g2d.setColor(oldColor);
+        g2d.setComposite(oldComposite);
+    }
+
+    private void drawMouseForceOverlay(Graphics2D g2d) {
+        if (!mouseHeld || mousePosition == null || mouseForceMode == MouseForceMode.NONE) return;
+
+        int x = (int) mousePosition.x();
+        int y = (int) mousePosition.y();
+        int radius = (int) Math.max(36, Math.min(96, 28 + Math.sqrt(mouseForceStrength) * 0.45));
+        double phase = (System.currentTimeMillis() % 1200) / 1200.0;
+        double animatedRadius = mouseForceMode == MouseForceMode.PUSH
+            ? radius * (0.45 + phase * 0.50)
+            : radius * (0.95 - phase * 0.50);
+        Color forceColor = mouseForceMode == MouseForceMode.PUSH
+            ? new Color(184, 118, 88)
+            : new Color(116, 145, 137);
+
+        Stroke oldStroke = g2d.getStroke();
+        Composite oldComposite = g2d.getComposite();
+        Color oldColor = g2d.getColor();
+
+        g2d.setColor(forceColor);
+        g2d.setStroke(new BasicStroke(2));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.16f));
+        g2d.drawOval(x - radius, y - radius, radius * 2, radius * 2);
+
+        int animatedDiameter = (int) Math.round(animatedRadius * 2);
+        int animatedX = (int) Math.round(x - animatedRadius);
+        int animatedY = (int) Math.round(y - animatedRadius);
+        float animatedAlpha = (float) (0.22 * (1.0 - Math.abs(phase - 0.5) * 0.8));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, animatedAlpha));
+        g2d.drawOval(animatedX, animatedY, animatedDiameter, animatedDiameter);
+
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.28f));
+        g2d.fillOval(x - 3, y - 3, 6, 6);
+
+        g2d.setStroke(oldStroke);
+        g2d.setComposite(oldComposite);
         g2d.setColor(oldColor);
     }
 }
