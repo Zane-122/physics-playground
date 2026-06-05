@@ -23,16 +23,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class Window {
-    private static final Color TOOLBAR_BACKGROUND = Color.WHITE;
+    private static final Color TOOLBAR_BACKGROUND = new Color(38, 38, 38);
     private static final Color PANEL_BACKGROUND = new Color(0x1c1c1c);
-    private static final Color BUTTON_BACKGROUND = new Color(72, 105, 178);
-    private static final Color SPAWN_BACKGROUND = new Color(117, 83, 160);
-    private static final Color SPAWN_ACTIVE_BACKGROUND = new Color(45, 139, 99);
-    private static final Color TEXT_LIGHT = new Color(245, 247, 250);
-    private static final Color TEXT_DARK = new Color(33, 37, 45);
-    private static final Color INPUT_BORDER = new Color(198, 205, 217);
-    private static final Color INPUT_ERROR_BORDER = new Color(196, 62, 62);
-    private static final Color INPUT_PENDING_BORDER = new Color(204, 140, 38);
+    private static final Color TOOLBAR_BORDER = new Color(62, 62, 62);
+    private static final Color BUTTON_BACKGROUND = new Color(89, 91, 94);
+    private static final Color SPAWN_BACKGROUND = new Color(112, 75, 68);
+    private static final Color SPAWN_ACTIVE_BACKGROUND = new Color(86, 116, 89);
+    private static final Color TEXT_LIGHT = new Color(238, 234, 226);
+    private static final Color TEXT_DARK = new Color(224, 220, 211);
+    private static final Color INPUT_BACKGROUND = new Color(30, 30, 30);
+    private static final Color INPUT_BORDER = new Color(92, 92, 92);
+    private static final Color INPUT_ERROR_BORDER = new Color(177, 89, 82);
+    private static final Color INPUT_PENDING_BORDER = new Color(174, 129, 63);
     private static final Color INPUT_SET_BORDER = SPAWN_ACTIVE_BACKGROUND;
     private static final Border INPUT_DEFAULT_BORDER = BorderFactory.createCompoundBorder(
         BorderFactory.createLineBorder(INPUT_BORDER),
@@ -84,7 +86,7 @@ public class Window {
         toolbarPanel.setOpaque(true);
         toolbarPanel.setBackground(TOOLBAR_BACKGROUND);
         toolbarPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 230, 238)),
+            BorderFactory.createMatteBorder(0, 0, 1, 0, TOOLBAR_BORDER),
             new EmptyBorder(4, 0, 4, 0)
         ));
 
@@ -480,7 +482,7 @@ public class Window {
         field.setMaximumSize(new Dimension(width, 34));
         field.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
         field.setForeground(TEXT_DARK);
-        field.setBackground(Color.WHITE);
+        field.setBackground(INPUT_BACKGROUND);
         field.setBorder(INPUT_DEFAULT_BORDER);
         return field;
     }
@@ -502,7 +504,7 @@ public class Window {
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 13));
         button.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(255, 255, 255, 70)),
+            BorderFactory.createLineBorder(new Color(238, 234, 226, 42)),
             new EmptyBorder(8, 14, 8, 14)
         ));
     }
